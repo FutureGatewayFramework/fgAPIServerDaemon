@@ -1,6 +1,7 @@
 language: python
 python:
   - "2.7"
+  - "3.6"
 install: 
   - pip install -r requirements.txt
   - pip install pycodestyle
@@ -10,14 +11,6 @@ script:
   - pycodestyle *.py
   - export FGTESTS_STOPATFAIL=1
   - export PYTHONPATH=$PYTHONPATH:..:.
-  - export FGAPISRV_NOTOKEN=True
-  - export FGAPISRV_NOTOKENUSR=test
-  - python -m unittest test_mklogtoken
-  - python -m unittest test_fgapiserverconfig
-  - python -m unittest test_fgapiserver
-  - export FGAPISRV_NOTOKEN=False
-  - export FGAPISRV_LNKPTVFLAG=False
-  - python -m unittest test_users_apis
 branches:
   only:
-    - releasing_user_api_envconfig
+    - master

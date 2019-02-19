@@ -1,10 +1,7 @@
-# FutureGateway API Server front-end (fgAPIServer)
-[![Travis](https://travis-ci.org/FutureGatewayFramework/fgAPIServer.svg?branch=EnvConfig)](https://travis-ci.org/FutureGatewayFramework/fgAPIServer)
+# FutureGateway APIServerDaemon
+[![Travis](https://travis-ci.org/FutureGatewayFramework/fgAPIServer.svg?branch=EnvConfig)](https://travis-ci.org/FutureGatewayFramework/fgAPIServerDaemon)
 [![License](https://img.shields.io/github/license/FutureGateway/geAPIServer.svg?style?flat)](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-This project implements the interface of a RESTful API Server, compliant with [CSGF APIs][specs] specifications. Any activity processed by this interface will be then processed by the [API Server Daemon][APIServerDaemon] component.
-The principal aim of this component is to accept incoming REST APIs, verify user rights and provide back a result. Some APIs require to fill a queue table which will be processed by the APIServerDaemon component. 
+This is the python version of the FutureGateway APIServerDaemon.
 
-   [specs]: <http://docs.csgfapis.apiary.io/#reference/v1.0/application/create-a-task>
-   [CSGF]: <https://www.catania-science-gateways.it>
-   [API Server Daemon]: <https://github.com/FutureGateway/APIServerDaemon>
+[FGAPISRV]: <https://github.com/FutureGateway/fgAPIServer>
