@@ -1,7 +1,7 @@
 # Tests
-This section contains a suite of tests able to check the consistency of the FutureGateway APIServer code (fgAPIServer).
+This section contains a suite of tests able to check the consistency of the FutureGateway APIServerDaemon code.
 To properly execute tests, some environment variables and/or configuration file changes have to be done.<br/>
-Configurations are normally taken from file: `fgapiserver.conf`, however, its parameters can be overridden, using environment variables. The name of these variables have to match the configuration file parameter name, all in upper case.
+Configurations are normally taken from file: `fgapiserverdaemon.conf`, however, its parameters can be overridden, using environment variables. The name of these variables have to match the configuration file parameter name, all in upper case.
 The following instructions explain how to configure the different tests.
 
 ##### PYTHONPATH
@@ -13,6 +13,7 @@ This setting allows to override the MySQLdb module and tests will use testing SQ
 
 ##### Test control settings
 Test execution can be controlled by environment variables as listed below:
+
 |Environment variable|Description|
 |---|---|
 |**FGTESTS_STOPATFAIL**| If enabled, test execution stops as soon as the first error occurs, use: `export FGTESTS_STOPATFAIL=1` to enable this feature|
@@ -22,25 +23,22 @@ Following configurations are valid for tests:
 
 | Test case |Description|Execution|
 |-----------|-----------|---------|
-|Log tokens|Baseline authentication methods|`python -m unittest test_mklogtoken`|
-|Configuration|Configuration settings|`test_fgapiserverconfig`|
-|Core APIs|Core API functionalities on Infrastructures/Applications/Tasks management|`test_fgapiserver`|
+|APIServerDaemon|Basic daemon functionalities|`python -m unittest test_fgapiserverdaemon`|
 
-##### Parameters
+##### Configuration parameters
 ```
-fgapisrv_notoken    = True
-fgapisrv_notokenusr = test
+<use defaul values>
 ```
 
 Following configurations are valid for tests:
 
 | Test case |Description|Execution|
 |-----------|-----------|---------|
-|User APIs|Users groups and role management APIs|`python -m unittest test_users_apis`|
+|ApiServerDaemon GUI|...|`python -m unittest test_fgapiserverdaemon_gui`|
 
+##### Configuration parameters
 ```
-fgapisrv_notoken    = False
-fgapisrv_lnkptvflag = False
+<use defaul values>
 ```
 
 ## MySQLdb
@@ -74,28 +72,11 @@ The code has to define internnaly a vector variable named: `fgapiserver_queries`
 ## Available tests
 Below details about the tests available:
 
-### test_mklogtoken.py
-This script executes a simple test on mklogtoken.py code used by the baseline Authentication and Authorization.
-It starts to encrypt username/password and timestamp and retrieve back this information with decrypting method.
+### test_fgapiserverdaemon.py
+This test suites checks basic functionalities of the APIServerDaemon.
 
-### test_fgapiserverconfig
-This script checks the functionalities offered by the configuration settings of the API server.
-
-### test_fgapiserver.py
-This test script makes use of unittests and its code is splitted in two separated sections. 
- A firt part consists of unit tests on `fgapiserver.py` code; the second part contains functional tests on developed 
- Flask endpoints. In the functional tests; each returned JSON is compared through its MD5Sum value with the
- `assertEqual()` method. The MD5Sum value to compare is extracted during the test case development and then hardcoded
-  inside the `assertEqual()` method.
-
-### test_fgapiserverconfig.py
-This test script makes use of unittests to perform tests on top of the FGApiServerConfig object used to store 
- fgAPIServer configuration options.
-
-### test_user_apis.py
-This test controls fgAPIServer APIs dedicated to the user management, using the baseline authentication method.
- For this reason it requires a specific configuration setting to work and a dedicated test case has been built to
-  check this condition.
+### test_fgapiserverdaemon_gui.py
+This test suites checks the user interface of the APIServerDaemon.
 
 ## Travis
 Travis file `.travis` contain an example of test suite execution.

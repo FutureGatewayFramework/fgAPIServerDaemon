@@ -26,7 +26,7 @@ __status__ = '${STATUS}'
 __update__ = '${UPDATE}'
 EOF
 
-for pyfile in $(/bin/ls -1 *.py *.wsgi); do
+for pyfile in $(/bin/ls -1 *.py *.wsgi tests/*.py); do
   echo "Releasing file: '$pyfile'"
   while read rel_line; do
       rel_item=$(echo $rel_line | awk -F'=' '{ print $1 }' | xargs echo)

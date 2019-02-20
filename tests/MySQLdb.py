@@ -16,20 +16,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import fgapiserver_queries
-import user_apis_queries
+import fgapiserverdaemon_queries
 
 #
 # MySQLdb.py emulates the MySQL module returning configurable outputs
 #            accordingly to pre-defined queries (see queries variable)
 #
 
-__author__ = "Riccardo Bruno"
-__copyright__ = "2015"
-__license__ = "Apache"
-__version__ = "v0.0.2-30-g37540b8-37540b8-37"
-__maintainer__ = "Riccardo Bruno"
-__email__ = "riccardo.bruno@ct.infn.it"
+__author__ = 'Riccardo Bruno'
+__copyright__ = '2019'
+__license__ = 'Apache'
+__version__ = 'v0.0.0'
+__maintainer__ = 'Riccardo Bruno'
+__email__ = 'riccardo.bruno@ct.infn.it'
+__status__ = 'devel'
+__update__ = '2019-02-20 20:01:44'
+
 
 queries = [
     {'category': 'empty',
@@ -38,8 +40,7 @@ queries = [
           'result': None}, ]}, ]
 
 # Load tests queries
-queries += fgapiserver_queries.queries
-queries += user_apis_queries.queries
+queries += fgapiserverdaemon_queries.queries
 
 
 class cursor:

@@ -54,7 +54,8 @@ class FGApiServerConfig(dict):
     # class variable fgConfigMsg
     defaults = {
         'fgapiserverdaemon': {
-            'fgapiver': def_api_ver,
+            'fgapiserverdaemon_processes': '1',
+            'fgapiserverdaemon_maxthreads': '3',
             'fgapiserverdaemon_name': 'API ServerDaemon',
             'fgapiserverdaemon_host': 'localhost',
             'fgapiserverdaemon_port': '8887',
@@ -78,8 +79,10 @@ class FGApiServerConfig(dict):
     # configuration options will be considered strings as default
     int_types = ['fgjson_indent',
                  'fgapiserverdaemon_port',
-                 'fgapisrv_db_port', ]
-    bool_types = ['fgapiserverdaemon_debug']
+                 'fgapisrv_db_port',
+                 'fgapiserverdaemon_processes',
+                 'fgapiserverdaemon_maxthreads', ]
+    bool_types = ['fgapiserverdaemon_debug', ]
 
     # Configuration messages informs about the loading
     # of configuration values
