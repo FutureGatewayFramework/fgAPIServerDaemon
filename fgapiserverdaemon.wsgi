@@ -25,7 +25,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-02-20 20:01:44'
+__update__ = '2019-02-20 23:01:48'
 
 
 import os
