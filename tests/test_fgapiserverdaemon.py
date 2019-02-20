@@ -19,7 +19,6 @@
 import unittest
 import fgapiserverdaemon
 import hashlib
-import json
 import os
 from fgapiserverdaemon_tools import get_fgapiserver_db
 
@@ -96,7 +95,6 @@ class TestfgAPIServer(unittest.TestCase):
         print "DB state: %s" % (state,)
         assert state[0] is False
     
-
 if __name__ == '__main__':
     print "----------------------------------"
     print "Starting unit tests ..."
