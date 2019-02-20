@@ -94,7 +94,8 @@ class TestfgAPIServer(unittest.TestCase):
         print result
         print "DB state: %s" % (state,)
         assert state[0] is False
-    
+
+
 if __name__ == '__main__':
     print "----------------------------------"
     print "Starting unit tests ..."
