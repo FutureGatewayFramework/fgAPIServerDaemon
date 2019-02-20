@@ -17,14 +17,15 @@
 # limitations under the License.
 
 import logging.config
+from fgapiserverdaemon_process import fgAPIServerDaemonProcess
 from fgapiserverdaemon_config import FGApiServerConfig
 from fgapiserverdaemon_tools import get_fgapiserver_db,\
                                     check_db_ver,\
-                                    check_db_reg,\
-                                    update_db_config
+                                    check_db_reg
 import os
 import sys
 import logging.config
+from multiprocessing import Process
 
 """
   FutureGateway APIServerDaemon
@@ -56,8 +57,6 @@ fgapisrv_db = get_fgapiserver_db()
 # Logging
 logging.config.fileConfig(fg_config['fgapiserverdaemon_logcfg'])
 logger = logging.getLogger(__name__)
-logger.debug("fgAPIServerDaemon is starting ...")
-logger.debug(fg_config.get_messages())
 
 #
 # The fgAPIServerDaemon starts here
@@ -73,5 +72,9 @@ check_db_reg(fg_config)
 if __name__ == "__main__":
     # Inform user about server activity
     logger.info("fgAPIServerDaemon is running ...")
-
+    for i in range(0, fg_config['fgapiserverdaemon_processes']):
+        p = Process(target=fgAPIServerDaemonProcess,
+                    args=(fg_config['fgapiserverdaemon_maxthreads'],))
+        p.start()
+        p.join()
     logger.info("fgAPIServerDaemon terminated ...")
