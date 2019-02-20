@@ -74,7 +74,6 @@ class TestfgAPIServer(unittest.TestCase):
         self.banner("checkDbVer()")
         self.assertEqual('0.0.12b', fgapiserverdaemon.check_db_ver())
 
-
     #
     # fgapiserverdb
     #
