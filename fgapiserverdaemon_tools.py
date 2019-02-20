@@ -60,6 +60,7 @@ logging.config.fileConfig(fg_config['fgapiserverdaemon_logcfg'])
 # Tooling functions commonly used by fgapiserber_ source codes
 #
 
+
 def get_fgapiserver_db():
     """
     Retrieve the fgAPIServer database object instance
@@ -76,6 +77,7 @@ def get_fgapiserver_db():
     if db is None:
         logging.error(message)
     return db
+
 
 def check_db_ver():
     """
@@ -127,6 +129,7 @@ def srv_uuid():
 #
 # Envconfig DB config  and registry functions
 #
+
 
 def check_db_reg(config):
     """

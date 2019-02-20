@@ -78,8 +78,7 @@ class FGApiServerConfig(dict):
     # configuration options will be considered strings as default
     int_types = ['fgjson_indent',
                  'fgapiserverdaemon_port',
-                 'fgapisrv_db_port',
-                ]
+                 'fgapisrv_db_port', ]
     bool_types = ['fgapiserverdaemon_debug']
 
     # Configuration messages informs about the loading

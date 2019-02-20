@@ -70,15 +70,13 @@ logger.debug(fg_config.get_messages())
 
 # setup Flask app
 app = Flask(__name__)
-#login_manager = LoginManager()
-#login_manager.init_app(app)
-
-
-
+# login_manager = LoginManager()
+# login_manager.init_app(app)
 
 ##
 # Routes as specified for APIServer at http://docs.csgfapis.apiary.io
 ##
+
 
 @app.route('/')
 @app.route('/<apiver>/')

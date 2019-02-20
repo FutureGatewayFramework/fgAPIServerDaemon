@@ -388,7 +388,6 @@ class FGAPIServerDB:
         """
         return self.err_flag, self.err_msg
 
-
     def queue_tasks_retrieve(self):
         """
         Retrieve queued tasks
@@ -408,8 +407,7 @@ class FGAPIServerDB:
             cursor.execute(sql, sql_data)
             for task_queue_record in cursor:
                 queued_tasks += [
-                    {"id":  task_queue_record[0],
-                    }]
+                    {"id":  task_queue_record[0], }]
             self.query_done(
                 "Queued tasks: %s" % queued_tasks)
         except MySQLdb.Error as e:
