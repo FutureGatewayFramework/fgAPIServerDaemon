@@ -67,7 +67,7 @@ class TestfgAPIServerConfig(unittest.TestCase):
         self.banner("Check default fgapiserverdaemon configuration settings")
         print fgapiserverdaemon.fg_config
         self.assertEqual(
-            fgapiserverdaemon.fg_config['processes'],1)
+            fgapiserverdaemon.fg_config['processes'], 1)
         self.assertEqual(
             fgapiserverdaemon.fg_config['maxthreads'], 5)
         self.assertEqual(
@@ -83,13 +83,15 @@ class TestfgAPIServerConfig(unittest.TestCase):
         self.assertEqual(
             fgapiserverdaemon.fg_config['extract_loop_delay'], 5)
         self.assertEqual(
-            fgapiserverdaemon.fg_config['logcfg'], 'fgapiserverdaemon_log.conf')
+            fgapiserverdaemon.fg_config['logcfg'],
+            'fgapiserverdaemon_log.conf')
         self.assertEqual(
             fgapiserverdaemon.fg_config['dbver'], '0.0.12b')
         self.assertEqual(
             fgapiserverdaemon.fg_config['fgapisrv_db_port'], 3306)
         self.assertEqual(
-            fgapiserverdaemon.fg_config['fgapisrv_db_pass'], 'fgapiserver_password')
+            fgapiserverdaemon.fg_config['fgapisrv_db_pass'],
+            'fgapiserver_password')
         self.assertEqual(
             fgapiserverdaemon.fg_config['fgapisrv_db_host'], '127.0.0.1')
         self.assertEqual(
@@ -107,7 +109,8 @@ class TestfgAPIServerConfig(unittest.TestCase):
         self.assertEqual(
             fgapiserverdaemon.fg_config['port'], 8887)
         self.assertEqual(
-            fgapiserverdaemon.fg_config['gui_logcfg'], 'fgapiserverdaemon_gui_log.conf')
+            fgapiserverdaemon.fg_config['gui_logcfg'],
+            'fgapiserverdaemon_gui_log.conf')
 
     # Default fgAPIServerDaemon configuration values matching defaults
     def test_ConfigObj(self):
@@ -127,9 +130,9 @@ class TestfgAPIServerConfig(unittest.TestCase):
             # Skip following values from test
             if key in ['logcfg', ]:
                 break
-            if type(fgapiserverdaemon.fg_config[key]) == type(True):
+            if isinstance(fgapiserverdaemon.fg_config[key], bool):
                 overwritten_value = not fgapiserverdaemon.fg_config[key]
-            elif type(fgapiserverdaemon.fg_config[key]) == type(0):
+            elif isinstance(fgapiserverdaemon.fg_config[key], int):
                 overwritten_value = -fgapiserverdaemon.fg_config[key]
             else:
                 overwritten_value = fgapiserverdaemon.fg_config[key][::-1]
@@ -138,7 +141,7 @@ class TestfgAPIServerConfig(unittest.TestCase):
                   (key, fgapiserverdaemon.fg_config[key], overwritten_value))
             os.environ[env_key] = "%s" % overwritten_value
             fg_config_nofile = FGApiServerConfig(None)
-            self.assertEqual(fg_config_nofile[key],overwritten_value)
+            self.assertEqual(fg_config_nofile[key], overwritten_value)
 
 
 if __name__ == '__main__':
