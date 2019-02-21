@@ -59,9 +59,12 @@ class FGApiServerConfig(dict):
             'process_loop_delay': '5',
             'checker_loop_delay': '5',
             'extract_loop_delay': '5',
+            'lock_dir': 'fgapiserverdaemon.lock',
+            'process_lock_file': 'fgapiserverdaemon.lock',
+            'thread_lock_file': 'fgapiserverdaemon.lock',
             'debug': 'True',
-            'fgjson_indent': '4',
             'logcfg': 'fgapiserverdaemon_log.conf',
+            'json_indent': 4,
         },
         'fgapiserverdaemon_gui': {
             'name': 'APIServerDaemon GUI',
@@ -77,14 +80,14 @@ class FGApiServerConfig(dict):
             'fgapisrv_db_user': 'fgapiserver',
             'fgapisrv_db_pass': 'fgapiserver_password',
             'fgapisrv_db_name': 'fgapiserver',
-            'dbver'           : '0.0.12b'
+            'dbver':            '0.0.12b'
         },
     }
 
     # Configuration data types
     # Following vectors consider only int and bool types remaining
     # configuration options will be considered strings as default
-    int_types = ['fgjson_indent',
+    int_types = ['json_indent',
                  'port',
                  'fgapisrv_db_port',
                  'processes',
@@ -176,7 +179,7 @@ class FGApiServerConfig(dict):
             for key in self.defaults[section]:
                 section_config[key] = self[key]
             config[section] = section_config
-        return json.dumps(config, indent=int(self['fgjson_indent']))
+        return json.dumps(config, indent=int(self['json_indent']))
 
     def show_conf(self):
         """

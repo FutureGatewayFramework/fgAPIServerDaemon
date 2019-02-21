@@ -39,13 +39,14 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-02-20 23:01:48'
+__update__ = '2019-02-21 21:40:19'
 
 # Logger object
 logger = None
 
 # FutureGateway database object
 fgapisrv_db = get_fgapiserver_db()
+
 
 class fgAPIServerDaemonProcessTaskExtractor(threading.Thread):
     def __init__(self, thread_manager):
@@ -63,7 +64,7 @@ class fgAPIServerDaemonProcessTaskExtractor(threading.Thread):
         fg_config = FGApiServerConfig(fgapiserver_config_file)
 
         # Prepare logger object
-        logging.config.fileConfig(fg_config['fgapiserverdaemon_logcfg'])
+        logging.config.fileConfig(fg_config['logcfg'])
         logger = logging.getLogger(__name__)
 
         # Store thread_manager

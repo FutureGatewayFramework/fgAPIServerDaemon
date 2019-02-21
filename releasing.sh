@@ -37,3 +37,6 @@ for pyfile in $(/bin/ls -1 *.py *.wsgi tests/*.py); do
 done
 
 rm -f $TMP
+
+# Call checkstyle
+pycodestyle *.py tests/*.py

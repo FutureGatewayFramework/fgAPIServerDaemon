@@ -37,7 +37,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-02-20 23:01:48'
+__update__ = '2019-02-21 21:40:19'
 
 # Logger object
 logger = None
@@ -48,6 +48,8 @@ fgapisrv_db = get_fgapiserver_db()
 #
 # Thread management class
 #
+
+
 class ThreadManager:
     num_slots = 0
 
@@ -64,7 +66,7 @@ class ThreadManager:
         fg_config = FGApiServerConfig(fgapiserver_config_file)
 
         # Prepare logger object
-        logging.config.fileConfig(fg_config['fgapiserverdaemon_logcfg'])
+        logging.config.fileConfig(fg_config['logcfg'])
         logger = logging.getLogger(__name__)
 
         # Store the number of available slots

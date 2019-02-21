@@ -29,7 +29,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-02-20 23:01:48'
+__update__ = '2019-02-21 21:40:19'
 
 # FGTESTS_STOPATFAIL environment controls the execution
 # of the tests, if defined, it stops test execution as
@@ -62,56 +62,6 @@ class TestfgAPIServerConfig(unittest.TestCase):
     # fgapiserver_config
     #
 
-    # Default fgAPIServerDaemon configuration values check
-    def test_CkeckDefaultConfig(self):
-        self.banner("Check default fgapiserverdaemon configuration settings")
-        print fgapiserverdaemon.fg_config
-        self.assertEqual(
-            fgapiserverdaemon.fg_config['processes'], 1)
-        self.assertEqual(
-            fgapiserverdaemon.fg_config['maxthreads'], 5)
-        self.assertEqual(
-            fgapiserverdaemon.fg_config['checker_loop_delay'], 5)
-        self.assertEqual(
-            fgapiserverdaemon.fg_config['fgjson_indent'], 4)
-        self.assertEqual(
-            fgapiserverdaemon.fg_config['fgjson_indent'], 4)
-        self.assertEqual(
-            fgapiserverdaemon.fg_config['process_loop_delay'], 5)
-        self.assertEqual(
-            fgapiserverdaemon.fg_config['debug'], True)
-        self.assertEqual(
-            fgapiserverdaemon.fg_config['extract_loop_delay'], 5)
-        self.assertEqual(
-            fgapiserverdaemon.fg_config['logcfg'],
-            'fgapiserverdaemon_log.conf')
-        self.assertEqual(
-            fgapiserverdaemon.fg_config['dbver'], '0.0.12b')
-        self.assertEqual(
-            fgapiserverdaemon.fg_config['fgapisrv_db_port'], 3306)
-        self.assertEqual(
-            fgapiserverdaemon.fg_config['fgapisrv_db_pass'],
-            'fgapiserver_password')
-        self.assertEqual(
-            fgapiserverdaemon.fg_config['fgapisrv_db_host'], '127.0.0.1')
-        self.assertEqual(
-            fgapiserverdaemon.fg_config['fgapisrv_db_name'], 'fgapiserver')
-        self.assertEqual(
-            fgapiserverdaemon.fg_config['fgapisrv_db_user'], 'fgapiserver')
-        self.assertEqual(
-            fgapiserverdaemon.fg_config['name'], 'APIServerDaemon GUI')
-        self.assertEqual(
-            fgapiserverdaemon.fg_config['crt'], '')
-        self.assertEqual(
-            fgapiserverdaemon.fg_config['host'], '127.0.0.1')
-        self.assertEqual(
-            fgapiserverdaemon.fg_config['key'], '')
-        self.assertEqual(
-            fgapiserverdaemon.fg_config['port'], 8887)
-        self.assertEqual(
-            fgapiserverdaemon.fg_config['gui_logcfg'],
-            'fgapiserverdaemon_gui_log.conf')
-
     # Default fgAPIServerDaemon configuration values matching defaults
     def test_ConfigObj(self):
         self.banner("Config Object")
@@ -125,11 +75,10 @@ class TestfgAPIServerConfig(unittest.TestCase):
     # Environment overriding feature
     def test_EnvConfig(self):
         self.banner("EnvConfig")
-
         for key in fgapiserverdaemon.fg_config.keys():
             # Skip following values from test
             if key in ['logcfg', ]:
-                break
+                continue
             if isinstance(fgapiserverdaemon.fg_config[key], bool):
                 overwritten_value = not fgapiserverdaemon.fg_config[key]
             elif isinstance(fgapiserverdaemon.fg_config[key], int):

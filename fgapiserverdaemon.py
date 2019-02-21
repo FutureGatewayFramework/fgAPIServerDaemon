@@ -38,7 +38,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-02-20 23:01:48'
+__update__ = '2019-02-21 21:40:19'
 
 
 # setup path
@@ -70,11 +70,26 @@ check_db_reg(fg_config)
 
 # Now execute accordingly to the app configuration (stand-alone/wsgi)
 if __name__ == "__main__":
+    # Create or check lock directory
+    try:
+        os.path.isdir(fg_config['lock_dir'])
+        logger.debug("Lock dir: '%s' already exists" % fg_config['lock_dir'])
+    except OSError:
+        logger.warn("Lock dir: '%s' does not exists, creating it"
+                    % fg_config['lock_dir'])
+        try:
+            os.makedirs(fg_config['lock_dir'])
+            logger.warn("Lock dir: '%s', successfuly created"
+                        % fg_config['lock_dir'])
+        except OSError:
+            logger.error("Unable to create process dir: '%s'"
+                         % fg_config['lock_dir'])
+            exit(1)
     # Inform user about server activity
     logger.info("fgAPIServerDaemon is running ...")
-    for i in range(0, fg_config['fgapiserverdaemon_processes']):
+    for i in range(0, fg_config['processes']):
         p = Process(target=fgAPIServerDaemonProcess,
-                    args=(fg_config['fgapiserverdaemon_maxthreads'],))
+                    args=(fg_config['maxthreads'],))
         p.start()
         p.join()
     logger.info("fgAPIServerDaemon terminated ...")
