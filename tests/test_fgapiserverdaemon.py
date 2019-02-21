@@ -62,13 +62,6 @@ class TestfgAPIServer(unittest.TestCase):
     # fgapiserver
     #
 
-    # Baseline authentication must be activated
-    def test_CkeckConfig(self):
-        self.banner("Check configuration settings")
-        self.assertEqual(
-            fgapiserverdaemon.fg_config['fgapiserverdaemon_name'],
-            'APIServerDaemon')
-
     def test_checkDbVer(self):
         self.banner("checkDbVer()")
         self.assertEqual('0.0.12b', fgapiserverdaemon.check_db_ver())

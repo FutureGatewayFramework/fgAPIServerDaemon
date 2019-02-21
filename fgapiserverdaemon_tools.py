@@ -54,7 +54,7 @@ fg_config = FGApiServerConfig(fgapiserver_config_file)
 fgapisrv_db = None
 
 # Logging
-logging.config.fileConfig(fg_config['fgapiserverdaemon_logcfg'])
+logging.config.fileConfig(fg_config['logcfg'])
 
 #
 # Tooling functions commonly used by fgapiserber_ source codes
@@ -99,15 +99,16 @@ def check_db_ver():
     else:
         # getDBVersion
         db_ver = fgapisrv_db.get_db_version()
-        if fg_config['fgapiserverdaemon_dbver'] is None or \
-           fg_config['fgapiserverdaemon_dbver'] == '' or \
-           fg_config['fgapiserverdaemon_dbver'] != db_ver:
+        conf_db_ver = fg_config['dbver']
+        if conf_db_ver is None or \
+           conf_db_ver == '' or \
+           conf_db_ver != db_ver:
             msg = ("Current database version '%s' is not compatible "
                    "with this version of the API server front-end; "
                    "version %s is required.\n"
                    "It is suggested to update your database applying "
                    "new available patches."
-                   % (db_ver, fg_config['fgapiserverdaemon_dbver']))
+                   % (db_ver, conf_db_ver))
             logging.error(msg)
             print msg
             sys.exit(1)

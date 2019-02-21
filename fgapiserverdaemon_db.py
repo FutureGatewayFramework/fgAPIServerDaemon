@@ -55,7 +55,7 @@ fgapiserver_config_file = fgapirundir + 'fgapiserverdaemon.conf'
 fg_config = FGApiServerConfig(fgapiserver_config_file)
 
 # Logging
-logging.config.fileConfig(fg_config['fgapiserverdaemon_logcfg'])
+logging.config.fileConfig(fg_config['logcfg'])
 
 
 def get_db(**kwargs):

@@ -51,7 +51,7 @@ fgapirundir = os.path.dirname(os.path.abspath(__file__)) + '/'
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # fgapiserver configuration file
-fgapiserver_config_file = fgapirundir + 'fgapiserverdaemon_gui_log.conf'
+fgapiserver_config_file = fgapirundir + 'fgapiserverdaemon.conf'
 
 # Load configuration
 fg_config = FGApiServerConfig(fgapiserver_config_file)
@@ -59,14 +59,10 @@ fg_config = FGApiServerConfig(fgapiserver_config_file)
 # FutureGateway database object
 fgapisrv_db = get_fgapiserver_db()
 
-# Load configuration
-logging.config.fileConfig(fg_config['fgapiserverdaemon_logcfg'])
-
 # Logging
-logging.config.fileConfig(fg_config['fgapiserverdaemon_logcfg'])
+logging.config.fileConfig(fg_config['logcfg'])
 logger = logging.getLogger(__name__)
-logger.debug("fgAPIServerDaemon GUI is starting ...")
-logger.debug(fg_config.get_messages())
+logger.debug("fgAPIServerDaemon GUI Starting")
 
 # setup Flask app
 app = Flask(__name__)

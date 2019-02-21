@@ -55,7 +55,7 @@ fg_config = FGApiServerConfig(fgapiserver_config_file)
 fgapisrv_db = get_fgapiserver_db()
 
 # Logging
-logging.config.fileConfig(fg_config['fgapiserverdaemon_logcfg'])
+logging.config.fileConfig(fg_config['logcfg'])
 logger = logging.getLogger(__name__)
 
 #

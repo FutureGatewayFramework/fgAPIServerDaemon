@@ -54,35 +54,45 @@ class FGApiServerConfig(dict):
     # class variable fgConfigMsg
     defaults = {
         'fgapiserverdaemon': {
-            'fgapiserverdaemon_processes': '1',
-            'fgapiserverdaemon_maxthreads': '3',
-            'fgapiserverdaemon_name': 'API ServerDaemon',
-            'fgapiserverdaemon_host': 'localhost',
-            'fgapiserverdaemon_port': '8887',
-            'fgapiserverdaemon_debug': 'True',
+            'processes': '1',
+            'maxthreads': '5',
+            'process_loop_delay': '5',
+            'checker_loop_delay': '5',
+            'extract_loop_delay': '5',
+            'debug': 'True',
             'fgjson_indent': '4',
-            'fgapiserverdaemon_key': '',
-            'fgapiserverdaemon_crt': '',
-            'fgapiserverdaemon_logcfg': 'fgapiserverdaemon_log.conf',
-            'fgapiserverdaemon_dbver': '0.0.12b',
+            'logcfg': 'fgapiserverdaemon_log.conf',
+        },
+        'fgapiserverdaemon_gui': {
+            'name': 'APIServerDaemon GUI',
+            'host': '127.0.0.1',
+            'port': '8887',
+            'key': '',
+            'crt': '',
+            'gui_logcfg': 'fgapiserverdaemon_gui_log.conf',
         },
         'fgapiserver_db': {
-            'fgapisrv_db_host': 'localhost',
+            'fgapisrv_db_host': '127.0.0.1',
             'fgapisrv_db_port': '3306',
-            'fgapisrv_db_user': 'localhost',
+            'fgapisrv_db_user': 'fgapiserver',
             'fgapisrv_db_pass': 'fgapiserver_password',
-            'fgapisrv_db_name': 'fgapiserver'},
+            'fgapisrv_db_name': 'fgapiserver',
+            'dbver'           : '0.0.12b'
+        },
     }
 
     # Configuration data types
     # Following vectors consider only int and bool types remaining
     # configuration options will be considered strings as default
     int_types = ['fgjson_indent',
-                 'fgapiserverdaemon_port',
+                 'port',
                  'fgapisrv_db_port',
-                 'fgapiserverdaemon_processes',
-                 'fgapiserverdaemon_maxthreads', ]
-    bool_types = ['fgapiserverdaemon_debug', ]
+                 'processes',
+                 'maxthreads',
+                 'process_loop_delay',
+                 'checker_loop_delay',
+                 'extract_loop_delay']
+    bool_types = ['debug', ]
 
     # Configuration messages informs about the loading
     # of configuration values
@@ -131,9 +141,9 @@ class FGApiServerConfig(dict):
                     # Corresponding environment variable not exists
                     pass
         # Logging
-        logging.config.fileConfig(self['fgapiserverdaemon_logcfg'])
+        logging.config.fileConfig(self['logcfg'])
         # Show configuration in Msg variable
-        if self['fgapiserverdaemon_debug']:
+        if self['debug']:
             self.fg_config_messages += self.show_conf()
             logging.debug("Initialized configuration object")
             logging.debug("Messages: %s" % self.fg_config_messages)
