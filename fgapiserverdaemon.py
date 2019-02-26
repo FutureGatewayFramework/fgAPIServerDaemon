@@ -22,6 +22,7 @@ from fgapiserverdaemon_config import\
     FGApiServerConfig
 from fgapiserverdaemon_process import\
     set_config as set_config_process,\
+    set_db as set_db_process,\
     fgAPIServerDaemonProcess
 from fgapiserverdaemon_tools import\
     set_config as set_config_tools,\
@@ -44,7 +45,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-02-26 19:17:59'
+__update__ = '2019-02-26 19:33:51'
 
 # Retrieve filename
 file_name, file_ext = os.path.basename(__file__).split('.')
@@ -74,9 +75,8 @@ set_config_process(fg_config)
 fgapisrv_db = get_fgapiserver_db()
 
 # Spread db object across components
+set_db_process(fgapisrv_db)
 # set_config_tools(fgapisrv_db)
-# set_db_process(fgapisrv_db)
-
 
 #
 # The fgAPIServerDaemon starts here
@@ -124,7 +124,7 @@ def main():
         processes.append(p)
     for p in processes:
         p.start()
-    for i in processes:
+    for p in processes:
         p.join()
 
     # fgAPIServerDaemon terminated

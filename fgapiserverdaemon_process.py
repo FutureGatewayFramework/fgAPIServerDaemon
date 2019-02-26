@@ -35,7 +35,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-02-26 19:17:59'
+__update__ = '2019-02-26 19:33:51'
 
 # Logging
 logger = logging.getLogger(__name__)
@@ -56,6 +56,17 @@ def set_config(config_obj):
     global fg_config
     fg_config = config_obj
     logging.debug("Receiving configuration object")
+
+
+def set_db(db_obj):
+    """
+    Receive fgAPIServerDaemon database object
+    :param database object:
+    :return:
+    """
+    global fgapisrv_db
+    fgapisrv_db = db_obj
+    logging.debug("Receiving database object")
 
 
 class fgAPIServerDaemonProcess():
