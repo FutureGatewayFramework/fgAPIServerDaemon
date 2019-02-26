@@ -48,7 +48,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-02-26 13:36:13'
+__update__ = '2019-02-26 16:08:31'
 
 
 # Retrieve filename
@@ -114,7 +114,7 @@ check_db_reg(fg_config)
 # Now execute accordingly to the app configuration (stand-alone/wsgi)
 if __name__ == "__main__":
     # Inform user about server activity
-    print ("fgAPIServerDaemon GUI running in stand-alone mode ...")
+    print("fgAPIServerDaemon GUI running in stand-alone mode ...")
 
     # Starting-up server
     if len(fg_config['crt']) > 0 and \

@@ -10,7 +10,7 @@ script:
   - pycodestyle *.py
   - export FGTESTS_STOPATFAIL=1
   - export PYTHONPATH=$PYTHONPATH:..:.
-  - pip uninstall PyMySQL
+  - pip uninstall -y PyMySQL
   - python -m unittest test_fgapiserverdaemon_config
   - python -m unittest test_fgapiserverdaemon
   - python -m unittest test_fgapiserverdaemon_gui
