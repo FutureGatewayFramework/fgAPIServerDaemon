@@ -31,7 +31,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-02-26 16:08:31'
+__update__ = '2019-02-26 19:17:59'
 
 """
  Database connection default settings
@@ -270,8 +270,6 @@ class FGAPIServerDB:
         cursor = None
         safe_transaction = False
         is_reg = False
-        logging.debug("tipo: %s" % type(str_uuid))
-        logging.debug("valore: '%s'" % str_uuid)
         try:
             db = self.connect(safe_transaction)
             cursor = db.cursor()

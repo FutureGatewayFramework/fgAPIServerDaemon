@@ -41,22 +41,27 @@ EOF
 
 # Call checkstyle
 check_style() {
-  pycodestyle --ignore=E402 *.py
+  pycodestyle --ignore=E402 *.py &&\
   pycodestyle tests/*.py
 }
 
 # Unittests
 unit_tests() {
-TEST_SUITE=(
-  fgapiserverdaemon
-  fgapiserverdaemon_config
-  fgapiserverdaemon_gui
-)
+  RES=1
+  TEST_SUITE=(
+    fgapiserverdaemon
+    fgapiserverdaemon_config
+    fgapiserverdaemon_gui
+  )
   cd tests
+  export PYTHONPATH=$PYTHONPATH:..:.
+  export FGTESTS_STOPATFAIL=1
   for test in ${TEST_SUITE[@]}; do
     python -m unittest test_${test}
   done
+  RES=0
   cd -
+  return $RES
 }
 
 # Releasing

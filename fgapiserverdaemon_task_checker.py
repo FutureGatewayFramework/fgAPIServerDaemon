@@ -17,12 +17,7 @@
 # limitations under the License.
 
 import logging.config
-from fgapiserverdaemon_thread_manager\
-    import ThreadManager
-from fgapiserverdaemon_tools\
-    import get_fgapiserver_db
-import os
-import sys
+import time
 import logging.config
 import threading
 
@@ -37,7 +32,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-02-26 16:08:31'
+__update__ = '2019-02-26 19:17:59'
 
 # Logging
 logger = logging.getLogger(__name__)
@@ -50,15 +45,26 @@ fgapisrv_db = None
 
 
 class fgAPIServerDaemonProcessTaskChecker(threading.Thread):
-    def __init__(self, thread_manager):
-        global logger
 
-        # Store thread_manager
-        self.thread_manager = thread_manager
+    loop_state = True
+    process_id = None
+
+    def __init__(self, process_id):
+        threading.Thread.__init__(self)
+        self.process_id = process_id
+
+    def log_str(self, string):
+        return "%s: %s" % (self.process_id, string)
 
     def run(self):
-        global logger
-        global fgapisrv_db
-        logger.debug("Starting fgAPIServerDaemon task checker")
-        logger.debug("Available thread slots: %s"
-                     % self.thread_manager.get_slots())
+        logging.debug(self.log_str(
+            "Starting fgAPIServerDaemon task checker"))
+        while self.loop_state is True:
+            logging.debug(self.log_str(
+                "Task extractor loop, sleepping 15 seconds ..."))
+            time.sleep(15)
+        logging.debug(self.log_str(
+            "Terminated fgAPIServerDaemon task checker"))
+
+    def end(self):
+        self.loop_state = False

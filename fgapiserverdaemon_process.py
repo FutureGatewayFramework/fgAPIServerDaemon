@@ -20,10 +20,7 @@ from fgapiserverdaemon_task_checker\
     import fgAPIServerDaemonProcessTaskChecker
 from fgapiserverdaemon_task_extractor\
     import fgAPIServerDaemonProcessTaskExtractor
-from fgapiserverdaemon_thread_manager\
-    import ThreadManager
 import os
-import sys
 import time
 import logging
 
@@ -38,7 +35,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-02-26 16:08:31'
+__update__ = '2019-02-26 19:17:59'
 
 # Logging
 logger = logging.getLogger(__name__)
@@ -65,11 +62,15 @@ class fgAPIServerDaemonProcess():
     """
     fgAPIServerDaemon process class
     """
+    process_pid = None
     max_threads = 0
 
     def __init__(self, max_threads):
         self.max_threads = max_threads
         self.process_pid = os.getpid()
+
+    def log_str(self, string):
+        return "%s: %s" % (self.process_pid, string)
 
     def run_processes(self):
         """
@@ -77,29 +78,22 @@ class fgAPIServerDaemonProcess():
         """
         global fg_config
 
-        logging.debug(
+        logging.debug(self.log_str(
             "Initializing fgAPIServerDaemon process, with PID: %s"
-            % self.process_pid)
-        logging.debug("Starting daemon processes")
+            % self.process_pid))
+
+        # At least 3 thread slots must be available for DaemonProcess
+        if(self.max_threads < 3):
+            logging.error(self.log_str(
+                "Max threads must be greather than: 3,"
+                "received: '%s', instead" % self.max_threads))
+            return
 
         # Scope of the process is to start the basic threads and use available
         # free slots (max_threads-2) to start ExecutorInterfaces instances
         # Basic threads are two:
         #   - The task extraction polling
-        #   - The check task polling
-
-        # Initialize the ThreadManager with available slots
-        thread_manager = ThreadManager(self.max_threads - 2)
-
-        # Starting basic threads - Task extractor
-        # task_extractor=fgAPIServerDaemonProcessTaskExtractor(thread_manager)
-        # task_extractor.start()
-        # task_extractor.join()
-
-        # Starting basic threads - Task checker
-        # task_checker = fgAPIServerDaemonProcessTaskChecker(thread_manager)
-        # task_checker.start()
-        # task_checker.join()
+        #   - The task checker polling
 
         lock_file = '%s/%s%s' % (fg_config['lock_dir'],
                                  self.process_pid,
@@ -107,17 +101,37 @@ class fgAPIServerDaemonProcess():
         try:
             t_file = open(lock_file, 'w')
             t_file.close()
-            logging.debug("Process with lock file: '%s', created"
-                          % lock_file)
-            logging.debug("Entering loop for process: '%s'"
-                          % self.process_pid)
+            logging.debug(self.log_str(
+                "Process with lock file: '%s', created" % lock_file))
+            # Starting task_extrator
+            task_extractor = \
+                fgAPIServerDaemonProcessTaskExtractor(self.process_pid)
+            task_extractor.start()
+
+            # Starting task_checker
+            task_checker = \
+                fgAPIServerDaemonProcessTaskChecker(self.process_pid)
+            task_checker.start()
+
+            # Polling loop
+            logging.debug(self.log_str(
+                "Entering loop for process: '%s'" % self.process_pid))
             while os.path.isfile(lock_file):
-                print("loop breath")
-                logging.debug("Process loop, sleeping for %s seconds"
-                              % fg_config['process_loop_delay'])
+                logging.debug(self.log_str(
+                    "Process loop, sleeping for %s seconds"
+                    % fg_config['process_loop_delay']))
                 time.sleep(fg_config['process_loop_delay'])
+
+            # Process lock file has been deleted, active threads must be
+            # stopped before leaving, disabling polling loops
+            task_extractor.end()
+            task_checker.end()
+            task_extractor.join()
+            task_checker.join()
         except IOError:
-            logging.error("Unable to create lock file: '%s'" % lock_file)
+            logging.error(self.log_str(
+                "Unable to create lock file: '%s'" % lock_file))
 
         # Process run finished
-        logging.debug("Process with lock file: '%s', terminated" % lock_file)
+        logging.debug(self.log_str(
+            "Process with lock file: '%s', terminated" % lock_file))
