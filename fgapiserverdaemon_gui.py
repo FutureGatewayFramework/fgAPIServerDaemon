@@ -19,16 +19,20 @@
 import logging.config
 from flask import Flask
 from flask import request
+from fgapiserverdaemon_db import\
+    set_config as set_config_db
 from fgapiserverdaemon_config import\
     FGApiServerConfig
+from fgapiserverdaemon_config import\
+    FGApiServerConfig
+from fgapiserverdaemon_tools import\
+    set_config as set_config_tools,\
+    get_fgapiserver_db,\
+    check_db_ver,\
+    check_db_reg
 # from flask_login import LoginManager,\
 #                         login_required,\
 #                         current_user
-from fgapiserverdaemon_tools import\
-    get_fgapiserver_db,\
-    check_db_ver,\
-    check_db_reg,\
-    update_db_config
 import os
 import sys
 import logging.config
@@ -44,26 +48,39 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-02-26 12:53:42'
+__update__ = '2019-02-26 13:36:13'
 
 
-# setup path
-fgapirundir = os.path.dirname(os.path.abspath(__file__)) + '/'
+# Retrieve filename
+file_name, file_ext = os.path.basename(__file__).split('.')
+
+# fgAPIServerDeemon configuration file
+config_file = file_name + '.yaml'
+
+# fgAPIServerDaemon log config file
+log_config_file = file_name + '_log.conf'
+
+# Retrieve execution dir and place it to path
+run_dir = os.path.dirname(os.path.abspath(__file__)) + '/'
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-# fgapiserver configuration file
-fgapiserver_config_file = fgapirundir + 'fgapiserverdaemon.conf'
+# Create root logger object and configure logger
+logging.config.fileConfig(run_dir + log_config_file)
 
 # Load configuration
-fg_config = FGApiServerConfig(fgapiserver_config_file)
+fg_config = FGApiServerConfig(config_file)
+
+# Spread configuration across components
+set_config_db(fg_config)
+set_config_tools(fg_config)
 
 # FutureGateway database object
 fgapisrv_db = get_fgapiserver_db()
 
-# Logging
-logging.config.fileConfig(fg_config['logcfg'])
-logger = logging.getLogger(__name__)
-logger.debug("fgAPIServerDaemon GUI Starting")
+# Spread db object across components
+# set_config_tools(fgapisrv_db)
+# set_db_process(fgapisrv_db)
+
 
 # setup Flask app
 app = Flask(__name__)
@@ -78,7 +95,7 @@ app = Flask(__name__)
 @app.route('/')
 def index():
 
-    logger.debug('index(%s): %s' % (request.method, request.values.to_dict()))
+    logging.debug('index(%s): %s' % (request.method, request.values.to_dict()))
     resp = "<html><body><h1>It works!</h1></body></html>"
     return resp
 
@@ -100,15 +117,15 @@ if __name__ == "__main__":
     print ("fgAPIServerDaemon GUI running in stand-alone mode ...")
 
     # Starting-up server
-    if len(fg_config['fgapiserverdaemon_crt']) > 0 and \
-            len(fg_config['fgapiserverdaemon_key']) > 0:
-        context = (fg_config['fgapiserverdaemon_crt'],
-                   fg_config['fgapiserverdaemon_key'])
-        app.run(host=fg_config['fgapiserverdaemon_host'],
-                port=fg_config['fgapiserverdaemon_port'],
+    if len(fg_config['crt']) > 0 and \
+            len(fg_config['key']) > 0:
+        context = (fg_config['crt'],
+                   fg_config['key'])
+        app.run(host=fg_config['host'],
+                port=fg_config['port'],
                 ssl_context=context,
-                debug=fg_config['fgapiserverdaemon_debug'])
+                debug=fg_config['debug'])
     else:
-        app.run(host=fg_config['fgapiserverdaemon_host'],
-                port=fg_config['fgapiserverdaemon_port'],
-                debug=fg_config['fgapiserverdaemon_debug'])
+        app.run(host=fg_config['host'],
+                port=fg_config['port'],
+                debug=fg_config['debug'])

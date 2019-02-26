@@ -107,21 +107,17 @@ class FGApiServerConfig(dict):
         logging.debug("Initializing config object")
 
         # Load config from config_file
-        conf_yaml = None
+        if config_file is None: config_file = ''
+        conf_yaml = {}
         try:
             conf_file = open(config_file, 'r')
             conf_yaml = yaml.load(conf_file)
-        except FileNotFoundError:
-            pass
-
-        # Parse configuration file
-        if (conf_yaml is None):
+            self.config_file = config_file
+        except IOError:
             logging.warn(
                 "Couldn't find configuration file '%s'; "
                 " default options will be used\n" % config_file)
-        else:
-            # Store configuration file name
-            self.config_file = config_file
+            pass
 
         # Load configuration settings using hardcoded key values as key
         # reference
