@@ -130,7 +130,7 @@ class FGApiServerConfig(dict):
                 except KeyError:
                     self[conf_name] = def_value
                     logging.warn(
-                        "[WARNING]:Couldn't find option '%s' "
+                        "Couldn't find option '%s' "
                         "in section '%s'; "
                         "using default value '%s'\n"
                         % (conf_name, section, def_value))

@@ -42,7 +42,9 @@ fgapiserverdaemon_queries = [
               'where name=%s;',
      'result': [[1], ]},
     {'id': 3,
-     'query': 'select count(*)>0 from srv_registry where uuid = %s;',
+     'query': 'select count(*)>0 from srv_registry\n'
+              'where uuid=%s\n'
+              '  and enabled=%s;',
      'result': [[1], ]},
     {'id': 4,
      'query': 'select cfg_hash srv_hash\n'
