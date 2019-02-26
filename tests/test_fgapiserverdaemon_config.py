@@ -41,10 +41,10 @@ class TestfgAPIServerConfig(unittest.TestCase):
 
     @staticmethod
     def banner(test_name):
-        print ""
-        print "------------------------------------------------"
-        print " Testing: %s" % test_name
-        print "------------------------------------------------"
+        print("")
+        print("------------------------------------------------")
+        print(" Testing: %s" % test_name)
+        print("------------------------------------------------")
 
     @staticmethod
     def md5sum(filename, blocksize=65536):
@@ -94,8 +94,8 @@ class TestfgAPIServerConfig(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    print "----------------------------------"
-    print "Starting unit tests ..."
-    print "----------------------------------"
+    print("----------------------------------")
+    print("Starting unit tests ...")
+    print("----------------------------------")
     unittest.main(failfast=stop_at_fail)
-    print "Tests completed"
+    print("Tests completed")

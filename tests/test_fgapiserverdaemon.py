@@ -41,10 +41,10 @@ class TestfgAPIServer(unittest.TestCase):
 
     @staticmethod
     def banner(test_name):
-        print ""
-        print "------------------------------------------------"
-        print " Testing: %s" % test_name
-        print "------------------------------------------------"
+        print("")
+        print("------------------------------------------------")
+        print(" Testing: %s" % test_name)
+        print("------------------------------------------------")
 
     @staticmethod
     def md5sum(filename, blocksize=65536):
@@ -84,14 +84,14 @@ class TestfgAPIServer(unittest.TestCase):
         self.banner("Testing fgapiserverdb test")
         result = self.fgapisrv_db.test()
         state = self.fgapisrv_db.get_state()
-        print result
-        print "DB state: %s" % (state,)
+        print("Result: '%s'" % result)
+        print("DB state: '%s'" % (state,))
         assert state[0] is False
 
 
 if __name__ == '__main__':
-    print "----------------------------------"
-    print "Starting unit tests ..."
-    print "----------------------------------"
+    print("----------------------------------")
+    print( "Starting unit tests ...")
+    print("----------------------------------")
     unittest.main(failfast=stop_at_fail)
-    print "Tests completed"
+    print("Tests completed")

@@ -46,10 +46,10 @@ class TestfgAPIServer(unittest.TestCase):
 
     @staticmethod
     def banner(test_name):
-        print ""
-        print "------------------------------------------------"
-        print " Testing: %s" % test_name
-        print "------------------------------------------------"
+        print("")
+        print("------------------------------------------------")
+        print(" Testing: %s" % test_name)
+        print("------------------------------------------------")
 
     @staticmethod
     def md5sum(filename, blocksize=65536):
@@ -71,15 +71,15 @@ class TestfgAPIServer(unittest.TestCase):
         self.banner("Endpoint: /")
         result = self.app.get('/')
         md5 = self.md5sum_str(result.data)
-        print "Result: '%s'" % result
-        print "Result data: '%s'" % result.data
-        print "MD5: '%s'" % md5
+        print("Result: '%s'" % result)
+        print("Result data: '%s'" % result.data)
+        print("MD5: '%s'" % md5)
         self.assertEqual(md5, 'c7b4690c8c46625ef0f328cd7a24a0a3')
 
 
 if __name__ == '__main__':
-    print "----------------------------------"
-    print "Starting unit tests ..."
-    print "----------------------------------"
+    print("----------------------------------")
+    print("Starting unit tests ...")
+    print("----------------------------------")
     unittest.main(failfast=stop_at_fail)
-    print "Tests completed"
+    print("Tests completed")
