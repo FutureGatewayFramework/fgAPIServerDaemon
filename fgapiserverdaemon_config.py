@@ -107,7 +107,8 @@ class FGApiServerConfig(dict):
         logging.debug("Initializing config object")
 
         # Load config from config_file
-        if config_file is None: config_file = ''
+        if config_file is None:
+            config_file = ''
         conf_yaml = {}
         try:
             conf_file = open(config_file, 'r')
