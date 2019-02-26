@@ -91,7 +91,7 @@ class TestfgAPIServer(unittest.TestCase):
 
 if __name__ == '__main__':
     print("----------------------------------")
-    print( "Starting unit tests ...")
+    print("Starting unit tests ...")
     print("----------------------------------")
     unittest.main(failfast=stop_at_fail)
     print("Tests completed")

@@ -95,14 +95,14 @@ class cursor:
                     dcnt += 1
                 ccnt += 1
             if show is not None:
-                print "Hilighting differences:"
-                print diff_report
-                print "%4d characters are matching" % scnt
-                print "%4d characters are not matching" % dcnt
+                print("Hilighting differences:")
+                print(diff_report)
+                print("%4d characters are matching" % scnt)
+                print("%4d characters are not matching" % dcnt)
         return scnt, dcnt
 
     def execute(self, sql, sql_data=None):
-        print "Executing: '%s'" % sql
+        print("Executing: '%s'" % sql)
         self.position = 0
         self.cursor_results = None
         rank_max = 0
@@ -121,20 +121,20 @@ class cursor:
                         rank_index = query['id']
                     if sql == query['query']:
                         self.cursor_results = query['result']
-                        print "Test query found, category: '%s' at %s" %\
-                              (category, query_index)
-                        print "result: '%s'" % self.cursor_results
+                        print("Test query found, category: '%s' at %s"
+                              % (category, query_index))
+                        print("result: '%s'" % self.cursor_results)
                         query_found = True
                         break
                 query_index += 1
         if query_found is not True:
-            print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-            print "!!! Test query not found !!!"
-            print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-            print "Procesed queries %s" % query_index
-            print "Closest query at index: '%s' is:" % rank_index
-            print "'%s'" % rank_query
-            print "whith score: %s" % rank_max
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            print("!!! Test query not found !!!")
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            print("Procesed queries %s" % query_index)
+            print("Closest query at index: '%s' is:" % rank_index)
+            print("'%s'" % rank_query)
+            print("whith score: %s" % rank_max)
             self.hilight_diff(sql, rank_query, True)
 
     def fetchone(self):
@@ -143,11 +143,11 @@ class cursor:
         else:
             res = self.cursor_results[self.position]
             self.position += 1
-            print "fetchone: %s" % res
+            print("fetchone: %s" % res)
             return res
 
     def close(self):
-        print "cursor close"
+        print("cursor close")
         return None
 
 
@@ -176,9 +176,9 @@ class MySQLdb:
         return cr
 
     def close(self):
-        print "MySQLdb.close"
+        print("MySQLdb.close")
         return None
 
     def commit(self):
-        print "MySQLdb.commit"
+        print("MySQLdb.commit")
         return None
