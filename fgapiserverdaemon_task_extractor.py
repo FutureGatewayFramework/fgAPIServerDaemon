@@ -19,8 +19,6 @@
 import logging.config
 from fgapiserverdaemon_thread_manager\
     import ThreadManager
-from fgapiserverdaemon_config\
-    import FGApiServerConfig
 from fgapiserverdaemon_tools\
     import get_fgapiserver_db
 import os
@@ -39,33 +37,22 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-02-21 21:40:19'
+__update__ = '2019-02-26 12:53:42'
 
-# Logger object
-logger = None
+# Logging
+logger = logging.getLogger(__name__)
+
+# fgAPIServerDaemon configuration
+fg_config = None
 
 # FutureGateway database object
-fgapisrv_db = get_fgapiserver_db()
+fgapisrv_db = None
 
 
 class fgAPIServerDaemonProcessTaskExtractor(threading.Thread):
     def __init__(self, thread_manager):
         global logger
         threading.Thread.__init__(self)
-
-        # setup path
-        fgapirundir = os.path.dirname(os.path.abspath(__file__)) + '/'
-        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
-        # fgapiserver configuration file
-        fgapiserver_config_file = fgapirundir + 'fgapiserverdaemon.conf'
-
-        # Load configuration
-        fg_config = FGApiServerConfig(fgapiserver_config_file)
-
-        # Prepare logger object
-        logging.config.fileConfig(fg_config['logcfg'])
-        logger = logging.getLogger(__name__)
 
         # Store thread_manager
         self.thread_manager = thread_manager

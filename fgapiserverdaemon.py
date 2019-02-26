@@ -16,21 +16,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging.config
-from fgapiserverdaemon_process import fgAPIServerDaemonProcess
-from fgapiserverdaemon_config import FGApiServerConfig
-from fgapiserverdaemon_tools import get_fgapiserver_db,\
-                                    check_db_ver,\
-                                    check_db_reg
+from fgapiserverdaemon_db import\
+    set_config as set_config_db
+from fgapiserverdaemon_config import\
+    FGApiServerConfig
+from fgapiserverdaemon_process import\
+    set_config as set_config_process,\
+    fgAPIServerDaemonProcess
+from fgapiserverdaemon_tools import\
+    set_config as set_config_tools,\
+    get_fgapiserver_db,\
+    check_db_ver,\
+    check_db_reg
+from multiprocessing import Process
 import os
 import sys
+import logging
 import logging.config
-from multiprocessing import Process
 
 """
   FutureGateway APIServerDaemon
 """
-
 __author__ = 'Riccardo Bruno'
 __copyright__ = '2019'
 __license__ = 'Apache'
@@ -38,25 +44,39 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-02-21 21:40:19'
+__update__ = '2019-02-26 12:53:42'
 
+# Retrieve filename
+file_name, file_ext = os.path.basename(__file__).split('.')
 
-# setup path
-fgapirundir = os.path.dirname(os.path.abspath(__file__)) + '/'
+# fgAPIServerDeemon configuration file
+config_file = file_name + '.yaml'
+
+# fgAPIServerDaemon log config file
+log_config_file = file_name + '_log.conf'
+
+# Retrieve execution dir and place it to path
+run_dir = os.path.dirname(os.path.abspath(__file__)) + '/'
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-# fgapiserver configuration file
-fgapiserver_config_file = fgapirundir + 'fgapiserverdaemon.conf'
+# Create root logger object and configure logger
+logging.config.fileConfig(run_dir + log_config_file)
 
 # Load configuration
-fg_config = FGApiServerConfig(fgapiserver_config_file)
+fg_config = FGApiServerConfig(config_file)
+
+# Spread configuration across components
+set_config_db(fg_config)
+set_config_tools(fg_config)
+set_config_process(fg_config)
 
 # FutureGateway database object
 fgapisrv_db = get_fgapiserver_db()
 
-# Logging
-logging.config.fileConfig(fg_config['logcfg'])
-logger = logging.getLogger(__name__)
+# Spread db object across components
+# set_config_tools(fgapisrv_db)
+# set_db_process(fgapisrv_db)
+
 
 #
 # The fgAPIServerDaemon starts here
@@ -68,28 +88,49 @@ check_db_ver()
 # Server registration and configuration from fgdb
 check_db_reg(fg_config)
 
-# Now execute accordingly to the app configuration (stand-alone/wsgi)
-if __name__ == "__main__":
+
+def main():
+    """
+    Main code for fgAPIServerDaemon
+    :return: None
+    """
+    logging.debug("fgAPIServerDaemon starts ...")
+
     # Create or check lock directory
-    try:
-        os.path.isdir(fg_config['lock_dir'])
-        logger.debug("Lock dir: '%s' already exists" % fg_config['lock_dir'])
-    except OSError:
-        logger.warn("Lock dir: '%s' does not exists, creating it"
-                    % fg_config['lock_dir'])
+    logging.debug("Checking lock directory: '%s'" % fg_config['lock_dir'])
+    if (os.path.isdir(fg_config['lock_dir'])):
+        logging.debug("Lock dir: '%s' already exists" % fg_config['lock_dir'])
+    else:
+        logging.warn("Lock dir: '%s' does not exists, creating it"
+                     % fg_config['lock_dir'])
         try:
             os.makedirs(fg_config['lock_dir'])
-            logger.warn("Lock dir: '%s', successfuly created"
-                        % fg_config['lock_dir'])
-        except OSError:
-            logger.error("Unable to create process dir: '%s'"
+            logging.warn("Lock dir: '%s', successfuly created"
                          % fg_config['lock_dir'])
+        except OSError:
+            logging.error("Unable to create process dir: '%s'"
+                          % fg_config['lock_dir'])
             exit(1)
+
     # Inform user about server activity
-    logger.info("fgAPIServerDaemon is running ...")
+    logging.info("fgAPIServerDaemon is running ...")
+    processes = []
     for i in range(0, fg_config['processes']):
-        p = Process(target=fgAPIServerDaemonProcess,
-                    args=(fg_config['maxthreads'],))
+        logging.debug(
+            "Starting process (%s/%s)" % (1 + i, fg_config['processes']))
+        process_object = fgAPIServerDaemonProcess(fg_config['maxthreads'])
+        p = Process(target=process_object.run_processes,
+                    args=())
+        processes.append(p)
+    for p in processes:
         p.start()
+    for i in processes:
         p.join()
-    logger.info("fgAPIServerDaemon terminated ...")
+
+    # fgAPIServerDaemon terminated
+    logging.info("fgAPIServerDaemon terminated ...")
+
+
+# Main code for fgAPIServerDaemon
+if __name__ == "__main__":
+    main()

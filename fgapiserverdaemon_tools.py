@@ -16,9 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from fgapiserverdaemon_config import FGApiServerConfig
 from fgapiserverdaemon_db import get_db
-import os
 import sys
 import uuid
 import socket
@@ -37,28 +35,35 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-02-21 21:40:19'
+__update__ = '2019-02-26 12:53:42'
 
 
-# setup path
-fgapirundir = os.path.dirname(os.path.abspath(__file__)) + '/'
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Logging
+logger = logging.getLogger(__name__)
 
-# fgapiserver configuration file
-fgapiserver_config_file = fgapirundir + 'fgapiserverdaemon.conf'
-
-# Load configuration
-fg_config = FGApiServerConfig(fgapiserver_config_file)
+# fgAPIServerDaemon configuration
+fg_config = None
 
 # FutureGateway database object
 fgapisrv_db = None
 
 # Logging
-logging.config.fileConfig(fg_config['logcfg'])
+logger = logging.getLogger(__name__)
 
 #
 # Tooling functions commonly used by fgapiserber_ source codes
 #
+
+
+def set_config(config_obj):
+    """
+    Receive fgAPIServerDaemon configuration settings
+    :param config_obj:
+    :return:
+    """
+    global fg_config
+    fg_config = config_obj
+    logger.debug("Receiving configuration object")
 
 
 def get_fgapiserver_db():
@@ -94,7 +99,7 @@ def check_db_ver():
     if fgapisrv_db is None:
         msg = "Unable to connect to the database!"
         logging.error(msg)
-        print msg
+        print(msg)
         sys.exit(1)
     else:
         # getDBVersion
@@ -110,7 +115,7 @@ def check_db_ver():
                    "new available patches."
                    % (db_ver, conf_db_ver))
             logging.error(msg)
-            print msg
+            print(msg)
             sys.exit(1)
     logging.debug("Check database version passed")
     return db_ver
@@ -145,13 +150,13 @@ def check_db_reg(config):
 
     # Retrieve the service UUID
     fgapisrv_uuid = srv_uuid()
-    if not fgapisrv_db.is_srv_reg(fgapisrv_uuid):
+    if not fgapisrv_db.is_srv_reg(str(fgapisrv_uuid)):
         # The service is not registered
         # Register the service and its configuration variables taken from
         # the configuration file and overwritten by environment variables
         logging.debug("Server has uuid: '%s' and it results not yet registered"
                       % fgapisrv_uuid)
-        fgapisrv_db.srv_register(fgapisrv_uuid, config)
+        fgapisrv_db.srv_register(str(fgapisrv_uuid), config)
         db_state = fgapisrv_db.get_state()
         if db_state[0] != 0:
             msg = ("Unable to register service under uuid: '%s'"
@@ -176,7 +181,7 @@ def update_db_config(config):
     """
     # Retrieve the service UUID
     fgapisrv_uuid = srv_uuid()
-    db_config = fgapisrv_db.srv_config(fgapisrv_uuid)
+    db_config = fgapisrv_db.srv_config(str(fgapisrv_uuid))
     for key in config.keys():
         if config[key] != db_config[key]:
             logging.debug("DB configuration overload: conf(%s)='%s'<-'%s'"

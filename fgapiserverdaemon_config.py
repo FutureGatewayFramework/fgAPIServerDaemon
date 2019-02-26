@@ -18,9 +18,8 @@
 
 import os
 import json
-import ConfigParser
+import yaml
 import logging
-import logging.config
 
 __author__ = 'Riccardo Bruno'
 __copyright__ = '2019'
@@ -28,6 +27,9 @@ __license__ = 'Apache'
 __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
+
+# Logging object
+logger = logging.getLogger(__name__)
 
 
 class FGApiServerConfig(dict):
@@ -40,9 +42,6 @@ class FGApiServerConfig(dict):
     values. The class also takes configuration values from environment
     variables, in this case they have the higher priority
     """
-
-    # Configuration file
-    config_file = None
 
     # Default values for configuration settings
     def_api_ver = '1.0'
@@ -60,10 +59,9 @@ class FGApiServerConfig(dict):
             'checker_loop_delay': '5',
             'extract_loop_delay': '5',
             'lock_dir': 'fgapiserverdaemon.lock',
-            'process_lock_file': 'fgapiserverdaemon.lock',
-            'thread_lock_file': 'fgapiserverdaemon.lock',
+            'process_lock_file': '.plock',
+            'thread_lock_file': '.tlock',
             'debug': 'True',
-            'logcfg': 'fgapiserverdaemon_log.conf',
             'json_indent': 4,
         },
         'fgapiserverdaemon_gui': {
@@ -72,7 +70,6 @@ class FGApiServerConfig(dict):
             'port': '8887',
             'key': '',
             'crt': '',
-            'gui_logcfg': 'fgapiserverdaemon_gui_log.conf',
         },
         'fgapiserver_db': {
             'fgapisrv_db_host': '127.0.0.1',
@@ -80,7 +77,7 @@ class FGApiServerConfig(dict):
             'fgapisrv_db_user': 'fgapiserver',
             'fgapisrv_db_pass': 'fgapiserver_password',
             'fgapisrv_db_name': 'fgapiserver',
-            'dbver':            '0.0.12b'
+            'dbver': '0.0.12b'
         },
     }
 
@@ -107,49 +104,53 @@ class FGApiServerConfig(dict):
         configuration file
         """
         dict.__init__(self)
+        logging.debug("Initializing config object")
+
+        # Load config from config_file
+        conf_yaml = None
+        try:
+            conf_file = open(config_file, 'r')
+            conf_yaml = yaml.load(conf_file)
+        except FileNotFoundError:
+            pass
 
         # Parse configuration file
-        config = ConfigParser.ConfigParser()
-        if (config_file is None or
-                len(config.read(config_file)) == 0):
-            self.fg_config_messages += (
-                    "[WARNING]: Couldn't find configuration file '%s'; "
-                    " default options will be used\n" % config_file)
+        if (conf_yaml is None):
+            logging.warn(
+                "Couldn't find configuration file '%s'; "
+                " default options will be used\n" % config_file)
         else:
             # Store configuration file name
             self.config_file = config_file
 
-        # Load configuration
+        # Load configuration settings using hardcoded key values as key
+        # reference
         for section in self.defaults.keys():
             for conf_name in self.defaults[section].keys():
                 def_value = self.defaults[section][conf_name]
                 try:
-                    self[conf_name] = config.get(section, conf_name)
-                except ConfigParser.Error:
+                    self[conf_name] = conf_yaml[section][conf_name]
+                except KeyError:
                     self[conf_name] = def_value
-                    self.fg_config_messages +=\
-                        ("[WARNING]:Couldn't find option '%s' "
-                         "in section '%s'; "
-                         "using default value '%s'\n"
-                         % (conf_name, section, def_value))
+                    logging.warn(
+                        "[WARNING]:Couldn't find option '%s' "
+                        "in section '%s'; "
+                        "using default value '%s'\n"
+                        % (conf_name, section, def_value))
                 # The use of environment varialbes override any default or
                 # configuration setting present in the configuration file
                 try:
                     env_value = os.environ[conf_name.upper()]
-                    self.fg_config_messages += \
-                        ("Environment bypass of '%s': '%s' <- '%s'\n" %
-                         (conf_name, self[conf_name], env_value))
+                    logging.warn(
+                        "Environment bypass of '%s': '%s' <- '%s'\n" %
+                        (conf_name, self[conf_name], env_value))
                     self[conf_name] = env_value
                 except KeyError:
                     # Corresponding environment variable not exists
                     pass
-        # Logging
-        logging.config.fileConfig(self['logcfg'])
-        # Show configuration in Msg variable
+
         if self['debug']:
-            self.fg_config_messages += self.show_conf()
-            logging.debug("Initialized configuration object")
-            logging.debug("Messages: %s" % self.fg_config_messages)
+            logging.debug(self.show_conf())
 
     def __getitem__(self, key):
         conf_value = dict.__getitem__(self, key)
@@ -193,7 +194,8 @@ class FGApiServerConfig(dict):
                 section_config[key] = self[key]
             config[section] = section_config
 
-        return ("---------------------------------------\n"
+        return ("\n"
+                "---------------------------------------\n"
                 " FutureGateway API ServerDaemon config \n"
                 "---------------------------------------\n"
                 "%s\n" % self)

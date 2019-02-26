@@ -16,12 +16,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from fgapiserverdaemon_config import FGApiServerConfig
-import MySQLdb
-import os
-import sys
 import logging
-
+import pymysql
+pymysql.install_as_MySQLdb()
+import MySQLdb
 
 """
   GridEngine APIServerDaemon database
@@ -33,7 +31,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-02-21 21:40:19'
+__update__ = '2019-02-26 12:53:42'
 
 """
  Database connection default settings
@@ -44,18 +42,25 @@ def_db_user = 'fgapiserver'
 def_db_pass = 'fgapiserver_password'
 def_db_name = 'fgapiserver'
 
-# setup path
-fgapirundir = os.path.dirname(os.path.abspath(__file__)) + '/'
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
-# fgapiserver configuration file
-fgapiserver_config_file = fgapirundir + 'fgapiserverdaemon.conf'
-
-# Load configuration
-fg_config = FGApiServerConfig(fgapiserver_config_file)
-
 # Logging
-logging.config.fileConfig(fg_config['logcfg'])
+logger = logging.getLogger(__name__)
+
+# fgAPIServerDaemon configuration
+fg_config = None
+
+# FutureGateway database object
+fgapisrv_db = None
+
+
+def set_config(config_obj):
+    """
+    Receive fgAPIServerDaemon configuration settings
+    :param config_obj:
+    :return:
+    """
+    global fg_config
+    fg_config = config_obj
+    logging.debug("Receiving configuration object")
 
 
 def get_db(**kwargs):
@@ -67,7 +72,7 @@ def get_db(**kwargs):
     """
     args = {}
     if kwargs is not None:
-        for key, value in kwargs.iteritems():
+        for key, value in kwargs.items():
             args[key] = value
     db_host = args.get('db_host', def_db_host)
     db_port = args.get('db_port', def_db_port)
@@ -248,7 +253,7 @@ class FGAPIServerDB:
             sql_data = ()
             logging.debug(sql % sql_data)
             cursor.execute(sql, sql_data)
-            dbver = cursor.fetchone()[0]
+            dbver, = cursor.fetchone()
             self.query_done("fgapiserver DB schema version: '%s'" % dbver)
         except MySQLdb.Error as e:
             self.catch_db_error(e, db, safe_transaction)
@@ -260,21 +265,25 @@ class FGAPIServerDB:
       is_srv_reg - Return true if the service is registered
     """
 
-    def is_srv_reg(self, service_uuid):
+    def is_srv_reg(self, str_uuid):
         db = None
         cursor = None
         safe_transaction = False
         is_reg = False
+        logging.debug("tipo: %s" % type(str_uuid))
+        logging.debug("valore: '%s'" % str_uuid)
         try:
             db = self.connect(safe_transaction)
             cursor = db.cursor()
-            sql = 'select count(*)>0 from srv_registry where uuid = %s;'
-            sql_data = (service_uuid,)
+            sql = ('select count(*)>0 from srv_registry\n'
+                   'where uuid=%s\n'
+                   '  and enabled=%s;')
+            sql_data = (str(str_uuid), True,)
             logging.debug(sql % sql_data)
             cursor.execute(sql, sql_data)
-            is_reg = cursor.fetchone()[0]
+            is_reg, = cursor.fetchone()
             self.query_done("Service registration '%s' is '%s'"
-                            % (service_uuid, is_reg))
+                            % (str_uuid, is_reg > 0))
         except MySQLdb.Error as e:
             self.catch_db_error(e, db, safe_transaction)
         finally:
@@ -286,7 +295,7 @@ class FGAPIServerDB:
                      configuration
     """
 
-    def srv_register(self, fgapisrv_uuid, config):
+    def srv_register(self, str_uuid, config):
         db = None
         cursor = None
         safe_transaction = True
@@ -300,7 +309,7 @@ class FGAPIServerDB:
                 '                          enabled)\n'
                 'values (%s,now(),now(),%s);'
             )
-            sql_data = (fgapisrv_uuid, True)
+            sql_data = (str_uuid, True)
             logging.debug(sql % sql_data)
             cursor.execute(sql, sql_data)
             # Now save configuration settings
@@ -315,7 +324,7 @@ class FGAPIServerDB:
                     '                        modified)\n'
                     'values (%s, %s, %s, %s, now(), now());'
                 )
-                sql_data = (fgapisrv_uuid, key, key_value, True)
+                sql_data = (str_uuid, key, key_value, True)
                 logging.debug(sql % sql_data)
                 cursor.execute(sql, sql_data)
             # Calculate configuration hash
@@ -325,19 +334,19 @@ class FGAPIServerDB:
                 'where uuid = %s\n'
                 'group by uuid;'
             )
-            sql_data = (fgapisrv_uuid,)
+            sql_data = (str_uuid,)
             logging.debug(sql % sql_data)
             cursor.execute(sql, sql_data)
-            cfg_hash = cursor.fetchone()[0]
+            cfg_hash, = cursor.fetchone()
             # Register calculated hash
             sql = 'update srv_registry set cfg_hash = %s where uuid = %s;'
-            sql_data = (cfg_hash, fgapisrv_uuid)
+            sql_data = (cfg_hash, str_uuid)
             logging.debug(sql % sql_data)
             cursor.execute(sql, sql_data)
             # Service registration queries executed
             self.query_done("Service with uuid: '%s' has been registered"
                             "and configuration parameters saved."
-                            % fgapisrv_uuid)
+                            % str_uuid)
         except MySQLdb.Error as e:
             self.catch_db_error(e, db, safe_transaction)
         finally:
@@ -366,8 +375,7 @@ class FGAPIServerDB:
             logging.debug(sql % sql_data)
             cursor.execute(sql, sql_data)
             for config in cursor:
-                kname = config[0]
-                kvalue = config[1]
+                kname, kvalue = config
                 fg_config[kname] = kvalue
             self.query_done("Configuration settings for service having "
                             "uuid: '%s' have been retrieved." % fgapisrv_uuid)
@@ -407,7 +415,7 @@ class FGAPIServerDB:
             cursor.execute(sql, sql_data)
             for task_queue_record in cursor:
                 queued_tasks += [
-                    {"id":  task_queue_record[0], }]
+                    {"id": task_queue_record[0], }]
             self.query_done(
                 "Queued tasks: %s" % queued_tasks)
         except MySQLdb.Error as e:

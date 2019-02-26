@@ -19,15 +19,16 @@
 import logging.config
 from flask import Flask
 from flask import request
-from fgapiserverdaemon_config import FGApiServerConfig
+from fgapiserverdaemon_config import\
+    FGApiServerConfig
 # from flask_login import LoginManager,\
 #                         login_required,\
 #                         current_user
-from fgapiserverdaemon_tools import get_fgapiserver_db,\
-                                    check_db_ver,\
-                                    check_db_reg,\
-                                    update_db_config
-
+from fgapiserverdaemon_tools import\
+    get_fgapiserver_db,\
+    check_db_ver,\
+    check_db_reg,\
+    update_db_config
 import os
 import sys
 import logging.config
@@ -43,7 +44,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-02-21 21:40:19'
+__update__ = '2019-02-26 12:53:42'
 
 
 # setup path

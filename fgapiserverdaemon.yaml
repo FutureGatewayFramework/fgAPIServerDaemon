@@ -19,20 +19,14 @@
 # thread_lock_file   - Postfix name for thread lock files
 # debug              - Debug operation mode True/False
 # fgjson_indent      - Indentation level for all readable JSON outputs
-# logcfg             - Log configuration file
-# dbver              - Needed database schema version
 #
 # Below the meaning of values belonging to the section: 'fgapiserverdaemon_gui'
 #
-# gui_name      - Name of the GUI server
-# gui_host      - Flask app host value (default 0.0.0.0)
-# gui_port      - Flask app listening port number
-# debug         - Debug operation mode True/False
-# fgjson_indent - Indentation level for all readable JSON outputs
-# gui_key       - Certificate key file path for  Flask in https
-# gui_crt       - Certificate public key path for Flask in https
-# logcfg        - Log configuration file
-# gui_logcfg    - GUI log configuration
+# name      - Name of the GUI server
+# host      - Flask app host value (default 0.0.0.0)
+# port      - Flask app listening port number
+# key       - Certificate key file path for  Flask in https
+# crt       - Certificate public key path for Flask in https
 #
 # Below the meaning of values belonging to the section: 'fgapiserver_db'
 #
@@ -41,37 +35,36 @@
 # fgapisrv_db_user - FutureGateway database user name
 # fgapisrv_db_pass - FutureGateway database user password
 # fgapisrv_db_name - FutureGateway database name
+# dbver            - Needed database schema version
 #
 
 # fgapiserverdaemon settings
-[fgapiserverdaemon]
-processes          = 1
-maxthreads         = 5
-process_loop_delay = 5
-checker_loop_delay = 5
-extract_loop_delay = 5
-lock_dir           = fgapiserverdaemon.lock
-process_lock_file  = fgapiserverdaemon.lock
-thread_lock_file   = fgapiserverdaemon.lock
-debug              = True
-logcfg             = fgapiserverdaemon_log.conf
-json_indent        = 4
+fgapiserverdaemon:
+  processes: 1
+  maxthreads: 5
+  process_loop_delay: 5
+  checker_loop_delay: 5
+  extract_loop_delay: 5
+  lock_dir: fgapiserverdaemon.lock
+  process_lock_file: .plock
+  thread_lock_file: .tlock
+  debug: True
+  json_indent: 4
 
 # fgapiserverdaemon GUI settings
-[fgapiserverdaemon_gui]
-name           = APIServerDaemon GUI
-host           = 127.0.0.1
-port           = 8887
-key            =
-crt            =
-gui_logcfg     = fgapiserverdaemon_gui_log.conf
+fgapiserverdaemon_gui:
+  name: APIServerDaemon GUI
+  host:  127.0.0.1
+  port: 8887
+  key:
+  crt:
 
 # futuregateway database settings
-[fgapiserver_db]
-dbver            = 0.0.12b
-fgapisrv_db_host = 127.0.0.1
-fgapisrv_db_port = 3306
-fgapisrv_db_user = fgapiserver
-fgapisrv_db_pass = fgapiserver_password
-fgapisrv_db_name = fgapiserver
+fgapiserver_db:
+  dbver: 0.0.12b
+  fgapisrv_db_host: 127.0.0.1
+  fgapisrv_db_port: 3306
+  fgapisrv_db_user: fgapiserver
+  fgapisrv_db_pass: fgapiserver_password
+  fgapisrv_db_name: fgapiserver
 

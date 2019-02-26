@@ -5,11 +5,12 @@ python:
 install: 
   - pip install -r requirements.txt
 script:
-  - pycodestyle *.py
+  - pycodestyle --ignore=E402 *.py
   - cd tests
   - pycodestyle *.py
   - export FGTESTS_STOPATFAIL=1
   - export PYTHONPATH=$PYTHONPATH:..:.
+  - python -m unittest test_fgapiserverdaemon_config
   - python -m unittest test_fgapiserverdaemon
   - python -m unittest test_fgapiserverdaemon_gui
 branches:
