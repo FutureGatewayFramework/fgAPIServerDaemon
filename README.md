@@ -9,4 +9,10 @@ There are three entities managed by this repository:
  * **fgAPIServerDaemon GUI** Provides a dashboard on daemon activities
  * **Executor Interfaces** Provides executor interfaces for this APIServerDaemon
 
+# Greetings
+This project uses the following third party code:
+
+ * **multiprocessing_log** Multiprocessing logs ina single file taken from [matgathu][GITPAGE]
+
 [FGAPISRV]: <https://github.com/FutureGateway/fgAPIServer>
+[GITPAGE]: <https://mattgathu.github.io/multiprocessing-logging-in-python/>
