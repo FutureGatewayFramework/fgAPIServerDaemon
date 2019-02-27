@@ -40,8 +40,8 @@
 
 # fgapiserverdaemon settings
 fgapiserverdaemon:
-  processes: 1
-  maxthreads: 5
+  processes: 3
+  maxthreads: 10
   process_loop_delay: 5
   checker_loop_delay: 5
   extract_loop_delay: 5

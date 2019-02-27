@@ -31,7 +31,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-02-26 19:33:51'
+__update__ = '2019-02-27 22:06:05'
 
 """
  Database connection default settings
@@ -108,32 +108,25 @@ def get_db(**kwargs):
 
 
 class FGAPIServerDB:
+    """
+    FutureGateway API Server Database class
+    """
 
-    """
-     API Server Database connection settings
-    """
+    # Database connection variables
     db_host = None
     db_port = None
     db_user = None
     db_pass = None
     db_name = None
 
-    """
-        Error Flag and messages filled up upon failures
-    """
+    # Error Flag and messages filled up upon failures
     err_flag = False
     err_msg = ''
     message = ''
 
-    """
-      FGAPIServerDB - Constructor may override default
-                      values defined at the top of the file
-    """
-
     def __init__(self, **kwargs):
         """
-
-        :rtype:
+        Constructor may override default values defined at the top of the file
         """
         self.db_host = kwargs.get('db_host', def_db_host)
         self.db_port = kwargs.get('db_port', def_db_port)
@@ -152,24 +145,21 @@ class FGAPIServerDB:
                          self.db_pass,
                          self.db_name))
 
-    """
-      catchDBError - common operations performed upon database
-                     query/transaction failure
-    """
-
     def catch_db_error(self, e, db, rollback):
+        """
+        Common operations performed upon database query/transaction failure
+        """
         logging.error("[ERROR] %d: %s" % (e.args[0], e.args[1]))
         if rollback is True:
             db.rollback()
         self.err_flag = True
         self.err_msg = "[ERROR] %d: %s" % (e.args[0], e.args[1])
 
-    """
-      close_db - common operatoins performed closing DB query/transaction
-    """
-
     @staticmethod
     def close_db(db, cursor, commit):
+        """
+        Common operations performed when closing DB query/transaction
+        """
         if cursor is not None:
             cursor.close()
         if db is not None:
@@ -177,22 +167,28 @@ class FGAPIServerDB:
                 db.commit()
             db.close()
 
-    """
-      query_done - reset the query error flag and eventually set
-                   a given query related message
-    """
+    def get_state(self):
+        """
+        Return the status and message of the last action on the DB
+
+        :return: Error flag, Error message
+        """
+        return self.err_flag, self.err_msg
 
     def query_done(self, message):
+        """
+        Reset the query error flag and eventually set a given query related
+        message
+        """
         self.err_flag = False
         self.err_msg = message
         logging.debug("Query done message:\n"
                       "%s" % message)
 
-    """
-      connect Connects to the fgapiserver database
-    """
-
     def connect(self, safe_transaction=False):
+        """
+        Connect to the fgapiserver database
+        """
         db = MySQLdb.connect(
             host=self.db_host,
             user=self.db_user,
@@ -208,11 +204,13 @@ class FGAPIServerDB:
             cursor.close()
         return db
 
-    """
-     test - DB connection tester function
-    """
-
     def test(self):
+        """
+        DB connection tester function
+
+        :return True if connection test have been successfully accomplished,
+        False otherwise
+        """
         db = None
         cursor = None
         safe_transaction = False
@@ -236,6 +234,7 @@ class FGAPIServerDB:
             self.catch_db_error(e, db, safe_transaction)
         finally:
             self.close_db(db, cursor, safe_transaction)
+        return not self.err_flag
 
     """
       get_db_version - Return the database version
@@ -261,11 +260,12 @@ class FGAPIServerDB:
             self.close_db(db, cursor, safe_transaction)
         return dbver
 
-    """
-      is_srv_reg - Return true if the service is registered
-    """
-
     def is_srv_reg(self, str_uuid):
+        """
+        Check if the given service UUID is registered
+
+        :return True if the service is registered
+        """
         db = None
         cursor = None
         safe_transaction = False
@@ -288,12 +288,10 @@ class FGAPIServerDB:
             self.close_db(db, cursor, safe_transaction)
         return is_reg
 
-    """
-      srv_register - Register the given server and stores its current
-                     configuration
-    """
-
     def srv_register(self, str_uuid, config):
+        """
+        Register the given server and stores its current configuration
+        """
         db = None
         cursor = None
         safe_transaction = True
@@ -350,12 +348,13 @@ class FGAPIServerDB:
         finally:
             self.close_db(db, cursor, safe_transaction)
 
-    """
-      srv_config - returns a dictionary containing configuration settings
-                   of the service using its uuid value
-    """
-
     def srv_config(self, fgapisrv_uuid):
+        """
+        Returns a dictionary containing configuration settings of the service
+        using its uuid value
+
+        :return Stored configuration settings
+        """
         global fg_config
         db = None
         cursor = None
@@ -383,20 +382,10 @@ class FGAPIServerDB:
             self.close_db(db, cursor, safe_transaction)
         return fg_config
 
-    """
-      get_state returns the status and message of the last action on the DB
-    """
-
-    def get_state(self):
-        """
-
-        :return: Error flag, Error message
-        """
-        return self.err_flag, self.err_msg
-
     def queue_tasks_retrieve(self):
         """
         Retrieve queued tasks
+
         :return: List of queued tasks
         """
         db = None

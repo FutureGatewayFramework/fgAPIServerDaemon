@@ -23,6 +23,7 @@ from fgapiserverdaemon_task_extractor\
 import os
 import time
 import logging
+import multiprocessing
 
 """
   FutureGateway APIServerDaemonProcess
@@ -35,7 +36,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-02-26 19:33:51'
+__update__ = '2019-02-27 22:06:05'
 
 # Logging
 logger = logging.getLogger(__name__)
@@ -50,8 +51,7 @@ fgapisrv_db = None
 def set_config(config_obj):
     """
     Receive fgAPIServerDaemon configuration settings
-    :param config_obj:
-    :return:
+    :param config_obj: Configuration settings object
     """
     global fg_config
     fg_config = config_obj
@@ -61,24 +61,27 @@ def set_config(config_obj):
 def set_db(db_obj):
     """
     Receive fgAPIServerDaemon database object
-    :param database object:
-    :return:
+    :param db_obj: database object
     """
     global fgapisrv_db
     fgapisrv_db = db_obj
     logging.debug("Receiving database object")
 
 
-class fgAPIServerDaemonProcess():
+class APIServerDaemonProcess:
     """
     fgAPIServerDaemon process class
     """
+    thread_num = 0
+    process = None
     process_pid = None
-    max_threads = 0
 
-    def __init__(self, max_threads):
-        self.max_threads = max_threads
-        self.process_pid = os.getpid()
+    def __init__(self, thread_num):
+        self.thread_num = thread_num
+        self.process = multiprocessing.current_process()
+        self.process_pid = "%s" % os.getpid() +\
+                           "_" +\
+                           "%s" % self.thread_num
 
     def log_str(self, string):
         return "%s: %s" % (self.process_pid, string)
@@ -88,16 +91,40 @@ class fgAPIServerDaemonProcess():
             fgAPIServerDaemonProcess
         """
         global fg_config
+        global fgapisrv_db
 
         logging.debug(self.log_str(
             "Initializing fgAPIServerDaemon process, with PID: %s"
             % self.process_pid))
 
+        # Config object must be present
+        if fg_config is None:
+            logging.error(self.log_str(
+                "Config object not present, unable to start APIServerDaemon "
+                "process"))
+            return
+
+        # Retrieve the maximum number of threads for this process
+        self.max_threads = fg_config['maxthreads']
+
         # At least 3 thread slots must be available for DaemonProcess
-        if(self.max_threads < 3):
+        if self.max_threads < 3:
             logging.error(self.log_str(
                 "Max threads must be greather than: 3,"
                 "received: '%s', instead" % self.max_threads))
+            return
+
+        # Database object must be present
+        if fgapisrv_db is None:
+            logging.error(self.log_str(
+                "Database object not present, unable to start"
+                "APIServerDaemon process"))
+            return
+
+        # Database object has to operate correctly
+        if not fgapisrv_db.test():
+            logging.error(self.log_str(
+                "fgAPIServerDaemon process could not connect to the database"))
             return
 
         # Scope of the process is to start the basic threads and use available
@@ -132,6 +159,8 @@ class fgAPIServerDaemonProcess():
                     "Process loop, sleeping for %s seconds"
                     % fg_config['process_loop_delay']))
                 time.sleep(fg_config['process_loop_delay'])
+            logging.debug(self.log_str(
+                "Loop terminated for process: '%s'" % self.process_pid))
 
             # Process lock file has been deleted, active threads must be
             # stopped before leaving, disabling polling loops

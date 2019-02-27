@@ -23,7 +23,7 @@ from fgapiserverdaemon_config import\
 from fgapiserverdaemon_process import\
     set_config as set_config_process,\
     set_db as set_db_process,\
-    fgAPIServerDaemonProcess
+    APIServerDaemonProcess
 from fgapiserverdaemon_tools import\
     set_config as set_config_tools,\
     get_fgapiserver_db,\
@@ -45,7 +45,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-02-26 19:33:51'
+__update__ = '2019-02-27 22:06:05'
 
 # Retrieve filename
 file_name, file_ext = os.path.basename(__file__).split('.')
@@ -118,7 +118,7 @@ def main():
     for i in range(0, fg_config['processes']):
         logging.debug(
             "Starting process (%s/%s)" % (1 + i, fg_config['processes']))
-        process_object = fgAPIServerDaemonProcess(fg_config['maxthreads'])
+        process_object = APIServerDaemonProcess(i)
         p = Process(target=process_object.run_processes,
                     args=())
         processes.append(p)
