@@ -17,13 +17,21 @@
 # limitations under the License.
 
 from fgapiserverdaemon_task_checker\
-    import fgAPIServerDaemonProcessTaskChecker
+    import\
+    APIServerDaemonProcessTaskChecker,\
+    set_config as set_config_checker,\
+    set_db as set_db_checker
 from fgapiserverdaemon_task_extractor\
-    import fgAPIServerDaemonProcessTaskExtractor
+    import\
+    APIServerDaemonProcessTaskExtractor,\
+    set_config as set_config_extractor,\
+    set_db as set_db_extractor
 import os
 import time
 import logging
+import Queue
 import multiprocessing
+import threading
 
 """
   FutureGateway APIServerDaemonProcess
@@ -36,7 +44,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-02-27 22:06:05'
+__update__ = '2019-03-14 18:48:34'
 
 # Logging
 logger = logging.getLogger(__name__)
@@ -75,6 +83,7 @@ class APIServerDaemonProcess:
     thread_num = 0
     process = None
     process_pid = None
+    max_threads = 0
 
     def __init__(self, thread_num):
         self.thread_num = thread_num
@@ -129,7 +138,7 @@ class APIServerDaemonProcess:
 
         # Scope of the process is to start the basic threads and use available
         # free slots (max_threads-2) to start ExecutorInterfaces instances
-        # Basic threads are two:
+        # Basic threads are:
         #   - The task extraction polling
         #   - The task checker polling
 
@@ -141,20 +150,39 @@ class APIServerDaemonProcess:
             t_file.close()
             logging.debug(self.log_str(
                 "Process with lock file: '%s', created" % lock_file))
+
+            # Extractor and Checker use a queue to store tasks
+            self.q_lock = threading.Lock()
+            self.q_extract = Queue.Queue(self.max_threads - 2)
+            self.q_check = Queue.Queue(self.max_threads - 2)
+
             # Starting task_extrator
             task_extractor = \
-                fgAPIServerDaemonProcessTaskExtractor(self.process_pid)
+                APIServerDaemonProcessTaskExtractor(self.process_pid,
+                                                    self.q_extract)
+            # Propagate config and db object
+            set_config_extractor(fg_config)
+            set_db_extractor(fgapisrv_db)
             task_extractor.start()
 
             # Starting task_checker
             task_checker = \
-                fgAPIServerDaemonProcessTaskChecker(self.process_pid)
+                APIServerDaemonProcessTaskChecker(self.process_pid,
+                                                  self.q_check)
+            # Propagate config and db object
+            set_config_checker(fg_config)
+            set_db_checker(fgapisrv_db)
             task_checker.start()
 
             # Polling loop
             logging.debug(self.log_str(
                 "Entering loop for process: '%s'" % self.process_pid))
             while os.path.isfile(lock_file):
+                # Process extracted commands
+                self.process_extracted_commands()
+                # Process commands to check
+
+                # Wait for the next commands loop
                 logging.debug(self.log_str(
                     "Process loop, sleeping for %s seconds"
                     % fg_config['process_loop_delay']))
@@ -175,3 +203,14 @@ class APIServerDaemonProcess:
         # Process run finished
         logging.debug(self.log_str(
             "Process with lock file: '%s', terminated" % lock_file))
+
+    def process_extracted_commands(self):
+        self.q_lock.acquire()
+        if not self.q_extract.empty():
+            command = self.q_extract.get()
+            self.q_lock.release()
+            logging.debug(self.log_str(
+                "Extracted command:\n"
+                "%s" % command))
+        else:
+            self.q_lock.release()

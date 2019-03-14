@@ -58,11 +58,13 @@ class FGApiServerConfig(dict):
             'process_loop_delay': '5',
             'checker_loop_delay': '5',
             'extract_loop_delay': '5',
+            'checker_loop_records': '5',
+            'extract_loop_records': '5',
             'lock_dir': 'fgapiserverdaemon.lock',
             'process_lock_file': '.plock',
             'thread_lock_file': '.tlock',
             'debug': 'True',
-            'json_indent': 4,
+            'json_indent': '4',
         },
         'fgapiserverdaemon_gui': {
             'name': 'APIServerDaemon GUI',
@@ -91,6 +93,8 @@ class FGApiServerConfig(dict):
                  'maxthreads',
                  'process_loop_delay',
                  'checker_loop_delay',
+                 'checker_loop_records',
+                 'extract_loop_records',
                  'extract_loop_delay']
     bool_types = ['debug', ]
 

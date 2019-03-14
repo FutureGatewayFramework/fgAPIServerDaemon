@@ -9,16 +9,18 @@
 #
 # Below the meaning of values belonging to the section: 'fgapiserverdaemon'
 #
-# processes          - Number of APIServerDaemon processes
-# maxthreads         - Maximum number of APIServerDaemon threads >= 3
-# process_loop_delay - Number of seconds process loop waits at each cycle
-# checker_loop_delay - Number of seconds checker loop waits at each cycle
-# extract_loop_delay - Number of seconds extract loop waits at each cycle
-# lock_dir           - Directory for thread and process lock files
-# process_lock_file  - Postfix name for process lock files
-# thread_lock_file   - Postfix name for thread lock files
-# debug              - Debug operation mode True/False
-# fgjson_indent      - Indentation level for all readable JSON outputs
+# processes            - Number of APIServerDaemon processes
+# maxthreads           - Maximum number of APIServerDaemon threads >= 3
+# process_loop_delay   - Number of seconds process loop waits at each cycle
+# checker_loop_delay   - Number of seconds checker loop waits at each cycle
+# extract_loop_delay   - Number of seconds extract loop waits at each cycle
+# checker_loop_records - Number of records to check extracted at each loop
+# extract_loop_records - Number of records to extract to run at each loop
+# lock_dir             - Directory for thread and process lock files
+# process_lock_file    - Postfix name for process lock files
+# thread_lock_file     - Postfix name for thread lock files
+# debug                - Debug operation mode True/False
+# fgjson_indent        - Indentation level for all readable JSON outputs
 #
 # Below the meaning of values belonging to the section: 'fgapiserverdaemon_gui'
 #
@@ -40,11 +42,13 @@
 
 # fgapiserverdaemon settings
 fgapiserverdaemon:
-  processes: 3
+  processes: 1
   maxthreads: 10
   process_loop_delay: 5
   checker_loop_delay: 5
   extract_loop_delay: 5
+  checker_loop_records: 5
+  extract_loop_records: 5
   lock_dir: fgapiserverdaemon.lock
   process_lock_file: .plock
   thread_lock_file: .tlock

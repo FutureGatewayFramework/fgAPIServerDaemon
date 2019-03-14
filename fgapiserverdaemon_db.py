@@ -20,6 +20,7 @@ import logging
 import pymysql
 pymysql.install_as_MySQLdb()
 import MySQLdb
+from fgapiserverdaemon_command import APIServerCommand
 
 """
   GridEngine APIServerDaemon database
@@ -31,7 +32,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-02-27 22:06:05'
+__update__ = '2019-03-14 18:48:34'
 
 """
  Database connection default settings
@@ -124,6 +125,9 @@ class FGAPIServerDB:
     err_msg = ''
     message = ''
 
+    # Unlock option, used to unlock
+    unlock_option = ''
+
     def __init__(self, **kwargs):
         """
         Constructor may override default values defined at the top of the file
@@ -156,15 +160,23 @@ class FGAPIServerDB:
         self.err_msg = "[ERROR] %d: %s" % (e.args[0], e.args[1])
 
     @staticmethod
-    def close_db(db, cursor, commit):
+    def close_db(db, cursor, commit, unlock_option=''):
         """
         Common operations performed when closing DB query/transaction
         """
         if cursor is not None:
             cursor.close()
+        if unlock_option != '':
+            cursor = db.cursor()
+            sql = unlock_option
+            sql_data = ()
+            logging.debug(sql % sql_data)
+            cursor.execute(sql)
+            cursor.close()
         if db is not None:
             if commit is True:
                 db.commit()
+                logging.debug("COMMIT")
             db.close()
 
     def get_state(self):
@@ -185,7 +197,10 @@ class FGAPIServerDB:
         logging.debug("Query done message:\n"
                       "%s" % message)
 
-    def connect(self, safe_transaction=False):
+    def connect(self,
+                safe_transaction=False,
+                lock_option='',
+                unlock_option=''):
         """
         Connect to the fgapiserver database
         """
@@ -201,7 +216,16 @@ class FGAPIServerDB:
             cursor = db.cursor()
             logging.debug(sql % sql_data)
             cursor.execute(sql)
+            logging.debug(sql % sql_data)
             cursor.close()
+        if db is not None and lock_option != '':
+            sql = lock_option
+            sql_data = ()
+            cursor = db.cursor()
+            logging.debug(sql % sql_data)
+            cursor.execute(sql)
+            cursor.close()
+            self.unlock_option = unlock_option
         return db
 
     def test(self):
@@ -236,11 +260,10 @@ class FGAPIServerDB:
             self.close_db(db, cursor, safe_transaction)
         return not self.err_flag
 
-    """
-      get_db_version - Return the database version
-    """
-
     def get_db_version(self):
+        """
+        Return FutureGateway database schema version
+        """
         db = None
         cursor = None
         safe_transaction = False
@@ -410,3 +433,140 @@ class FGAPIServerDB:
         finally:
             self.close_db(db, cursor, safe_transaction)
         return queued_tasks
+
+    def get_queued_commands(self, max_commands):
+        """
+        Returns an array of commands for task submission from APIServer queue
+        having at most given number of elements
+
+        :param max_commands: Maximum number of commands to extract for
+         execution
+        :return Array of commands
+        """
+        db = None
+        cursor = None
+        safe_transaction = False
+        commands = []
+        try:
+            db = self.connect(safe_transaction, 'lock tables as_queue write;')
+            cursor = db.cursor()
+            sql = (
+                "select task_id\n"
+                "      ,target_id\n"
+                "      ,target\n"
+                "      ,action\n"
+                "      ,status\n"
+                "      ,target_status\n"
+                "      ,retry\n"
+                "      ,creation\n"
+                "      ,last_change\n"
+                "      ,check_ts\n"
+                "      ,action_info\n"
+                "from as_queue\n"
+                "where status = 'QUEUED'\n"
+                "   or status = 'PROCESSED'\n"
+                "order by last_change asc\n"
+                "limit %s;")
+            sql_data = (max_commands,)
+            logging.debug(sql % sql_data)
+            cursor.execute(sql, sql_data)
+            for queue_command in cursor:
+                command = APIServerCommand(
+                    task_id=queue_command[0],
+                    target_id=queue_command[1],
+                    target=queue_command[2],
+                    action=queue_command[3],
+                    status=queue_command[4],
+                    target_status=queue_command[5],
+                    retry=queue_command[6],
+                    creation=queue_command[7],
+                    last_change=queue_command[8],
+                    check_ts=queue_command[9],
+                    action_info=queue_command[10])
+                commands.append(command)
+            # Mark taken commands as PROCESSING
+            for queue_command in commands:
+                sql = (
+                    "update as_queue set status = 'PROCESSING'\n"
+                    "                   ,last_change = now()\n"
+                    "where task_id=%s\n"
+                    "  and action=%s;")
+                sql_data = (queue_command['task_id'],
+                            queue_command['action'])
+                logging.debug(sql % sql_data)
+                cursor.execute(sql, sql_data)
+            self.query_done("Loaded %s queue records " % len(commands))
+        except MySQLdb.Error as e:
+            self.catch_db_error(e, db, safe_transaction)
+        finally:
+            self.close_db(db, cursor, safe_transaction, 'unlock tables;')
+        return commands
+
+    def get_check_commands(self, max_commands):
+        """
+        Returns an array of commands to check from APIServer queue having at
+        most given number of elements
+
+        :param max_commands: Maximum number of commands to extract for check
+        :return Array of commands
+        """
+        db = None
+        cursor = None
+        safe_transaction = False
+        commands = []
+        try:
+            db = self.connect(safe_transaction,
+                              'lock tables as_queue write;',
+                              'unlock tables;')
+            cursor = db.cursor()
+            sql = (
+                "select task_id\n"
+                "      ,target_id\n"
+                "      ,target\n"
+                "      ,action\n"
+                "      ,status\n"
+                "      ,target_status\n"
+                "      ,retry\n"
+                "      ,creation\n"
+                "      ,last_change\n"
+                "      ,check_ts\n"
+                "      ,action_info\n"
+                "from as_queue\n"
+                "where status = 'PROCESSING'\n"
+                "   or status = 'PROCESSED'\n"
+                "order by check_ts asc\n"
+                "limit %s;")
+            sql_data = (max_commands,)
+            logging.debug(sql % sql_data)
+            cursor.execute(sql, sql_data)
+            for queue_command in cursor:
+                command = APIServerCommand(
+                    task_id=queue_command[0],
+                    target_id=queue_command[1],
+                    target=queue_command[2],
+                    action=queue_command[3],
+                    status=queue_command[4],
+                    target_status=queue_command[5],
+                    retry=queue_command[6],
+                    creation=queue_command[7],
+                    last_change=queue_command[8],
+                    check_ts=queue_command[9],
+                    action_info=queue_command[10])
+                commands.append(command)
+            # Mark taken commands as PROCESSING
+            for queue_command in commands:
+                sql = (
+                    "update as_queue set status = 'PROCESSING'\n"
+                    "                   ,last_change = now()\n"
+                    "where task_id=%s\n"
+                    "  and action=%s;")
+                sql_data = (queue_command['task_id'],
+                            queue_command['action'])
+                logging.debug(sql % sql_data)
+                cursor.execute(sql, sql_data)
+            self.query_done("Loaded %s queue records " % len(commands))
+        except MySQLdb.Error as e:
+            self.catch_db_error(e, db, safe_transaction)
+        finally:
+            self.close_db(db, cursor, safe_transaction)
+        return commands
