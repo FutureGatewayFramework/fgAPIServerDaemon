@@ -55,6 +55,8 @@ fgapiserverdaemon:
   debug: True
   json_indent: 4
   fgapisrv_iosandbox: /tmp/fgiosandbox
+  fgasd_log_conf: fgapiserverdaemon_log.conf
+  fgasd_gui_log_conf: fgapiserverdaemon_gui_log.conf
 
 # fgapiserverdaemon GUI settings
 fgapiserverdaemon_gui:
