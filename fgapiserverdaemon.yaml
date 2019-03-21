@@ -54,6 +54,7 @@ fgapiserverdaemon:
   thread_lock_file: .tlock
   debug: True
   json_indent: 4
+  fgapisrv_iosandbox: /tmp/fgiosandbox
 
 # fgapiserverdaemon GUI settings
 fgapiserverdaemon_gui:

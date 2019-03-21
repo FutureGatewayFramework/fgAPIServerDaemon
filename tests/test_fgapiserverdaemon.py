@@ -20,7 +20,8 @@ import unittest
 import fgapiserverdaemon
 import hashlib
 import os
-from fgapiserverdaemon_tools import get_fgapiserver_db
+from fgapiserverdaemon_config import fg_config
+from fgapiserverdaemon_db import fgapisrv_db
 
 __author__ = 'Riccardo Bruno'
 __copyright__ = '2019'
@@ -29,7 +30,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-03-14 18:48:34'
+__update__ = '2019-03-21 19:19:57'
 
 # FGTESTS_STOPATFAIL environment controls the execution
 # of the tests, if defined, it stops test execution as
@@ -66,24 +67,14 @@ class TestfgAPIServer(unittest.TestCase):
         self.banner("checkDbVer()")
         self.assertEqual('0.0.12b', fgapiserverdaemon.check_db_ver())
 
-    #
-    # fgapiserverdb
-    #
-    fgapisrv_db = get_fgapiserver_db()
-
     def test_dbobject(self):
         self.banner("Testing fgapiserverdb get DB object")
-        assert self.fgapisrv_db is not None
-
-    def test_dbobj_connect(self):
-        self.banner("Testing fgapiserverdb connect")
-        conn = self.fgapisrv_db.connect()
-        assert conn is not None
+        assert fgapisrv_db is not None
 
     def test_dbobj_test(self):
         self.banner("Testing fgapiserverdb test")
-        result = self.fgapisrv_db.test()
-        state = self.fgapisrv_db.get_state()
+        result = fgapisrv_db.test()
+        state = fgapisrv_db.get_state()
         print("Result: '%s'" % result)
         print("DB state: '%s'" % (state,))
         assert state[0] is False

@@ -16,13 +16,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging.config
-from fgapiserverdaemon_thread_manager\
-    import ThreadManager
-from fgapiserverdaemon_config\
-    import FGApiServerConfig
-from fgapiserverdaemon_tools import\
-    get_fgapiserver_db
+from fgapiserverdaemon_config import fg_config
+from fgapiserverdaemon_db import fgapisrv_db
 import os
 import sys
 import logging.config
@@ -39,13 +34,10 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-03-14 18:48:34'
+__update__ = '2019-03-21 19:19:57'
 
 # Logger object
 logger = None
-
-# FutureGateway database object
-fgapisrv_db = get_fgapiserver_db()
 
 
 class fgAPIServerDaemonEI(threading.Thread):
@@ -53,18 +45,6 @@ class fgAPIServerDaemonEI(threading.Thread):
         global logger
         threading.Thread.__init__(self)
 
-        # setup path
-        fgapirundir = os.path.dirname(os.path.abspath(__file__)) + '/'
-        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
-        # fgapiserver configuration file
-        fgapiserver_config_file = fgapirundir + 'fgapiserverdaemon.conf'
-
-        # Load configuration
-        fg_config = FGApiServerConfig(fgapiserver_config_file)
-
-        # Prepare logger object
-        logging.config.fileConfig(fg_config['fgapiserverdaemon_logcfg'])
         logger = logging.getLogger(__name__)
 
         # Store thread_manager

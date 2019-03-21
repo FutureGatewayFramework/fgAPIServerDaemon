@@ -47,7 +47,6 @@ check_style() {
 
 # Unittests
 unit_tests() {
-  RES=1
   TEST_SUITE=(
     fgapiserverdaemon
     fgapiserverdaemon_config
@@ -57,11 +56,10 @@ unit_tests() {
   export PYTHONPATH=$PYTHONPATH:..:.
   export FGTESTS_STOPATFAIL=1
   for test in ${TEST_SUITE[@]}; do
-    python -m unittest test_${test}
+    python -m unittest --failfast test_${test}
+    [ $? -ne 0 ] && return 1 
   done
-  RES=0
   cd -
-  return $RES
 }
 
 # Releasing

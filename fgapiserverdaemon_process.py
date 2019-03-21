@@ -16,22 +16,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from fgapiserverdaemon_task_checker\
-    import\
-    APIServerDaemonProcessTaskChecker,\
-    set_config as set_config_checker,\
-    set_db as set_db_checker
-from fgapiserverdaemon_task_extractor\
-    import\
-    APIServerDaemonProcessTaskExtractor,\
-    set_config as set_config_extractor,\
-    set_db as set_db_extractor
 import os
 import time
 import logging
 import Queue
 import multiprocessing
 import threading
+from fgapiserverdaemon_config import fg_config
+from fgapiserverdaemon_db import fgapisrv_db
+from fgapiserverdaemon_task_checker import\
+    APIServerDaemonProcessTaskChecker
+from fgapiserverdaemon_task_extractor import\
+    APIServerDaemonProcessTaskExtractor
+
 
 """
   FutureGateway APIServerDaemonProcess
@@ -44,36 +41,10 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-03-14 18:48:34'
+__update__ = '2019-03-21 19:19:57'
 
 # Logging
 logger = logging.getLogger(__name__)
-
-# fgAPIServerDaemon configuration
-fg_config = None
-
-# FutureGateway database object
-fgapisrv_db = None
-
-
-def set_config(config_obj):
-    """
-    Receive fgAPIServerDaemon configuration settings
-    :param config_obj: Configuration settings object
-    """
-    global fg_config
-    fg_config = config_obj
-    logging.debug("Receiving configuration object")
-
-
-def set_db(db_obj):
-    """
-    Receive fgAPIServerDaemon database object
-    :param db_obj: database object
-    """
-    global fgapisrv_db
-    fgapisrv_db = db_obj
-    logging.debug("Receiving database object")
 
 
 class APIServerDaemonProcess:
@@ -99,9 +70,6 @@ class APIServerDaemonProcess:
         """
             fgAPIServerDaemonProcess
         """
-        global fg_config
-        global fgapisrv_db
-
         logging.debug(self.log_str(
             "Initializing fgAPIServerDaemon process, with PID: %s"
             % self.process_pid))
@@ -160,18 +128,12 @@ class APIServerDaemonProcess:
             task_extractor = \
                 APIServerDaemonProcessTaskExtractor(self.process_pid,
                                                     self.q_extract)
-            # Propagate config and db object
-            set_config_extractor(fg_config)
-            set_db_extractor(fgapisrv_db)
             task_extractor.start()
 
             # Starting task_checker
             task_checker = \
                 APIServerDaemonProcessTaskChecker(self.process_pid,
                                                   self.q_check)
-            # Propagate config and db object
-            set_config_checker(fg_config)
-            set_db_checker(fgapisrv_db)
             task_checker.start()
 
             # Polling loop

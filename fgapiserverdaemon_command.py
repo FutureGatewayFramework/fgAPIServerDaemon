@@ -28,16 +28,10 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-03-14 18:48:34'
+__update__ = '2019-03-21 19:19:57'
 
 # Logging
 logger = logging.getLogger(__name__)
-
-# fgAPIServerDaemon configuration
-fg_config = None
-
-# FutureGateway database object
-fgapisrv_db = None
 
 
 def set_config(config_obj):

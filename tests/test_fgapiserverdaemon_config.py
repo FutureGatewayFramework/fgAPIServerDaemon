@@ -16,11 +16,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from fgapiserverdaemon_config import FGApiServerConfig
 import unittest
 import fgapiserverdaemon
 import hashlib
 import os
+from fgapiserverdaemon_config import FGApiServerConfig
+from fgapiserverdaemon_config import fg_config
 
 __author__ = 'Riccardo Bruno'
 __copyright__ = '2019'
@@ -29,7 +30,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-03-14 18:48:34'
+__update__ = '2019-03-21 19:19:57'
 
 # FGTESTS_STOPATFAIL environment controls the execution
 # of the tests, if defined, it stops test execution as

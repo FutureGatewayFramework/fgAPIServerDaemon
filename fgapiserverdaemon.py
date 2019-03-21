@@ -16,22 +16,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from fgapiserverdaemon_db import\
-    set_config as set_config_db
-from fgapiserverdaemon_config import\
-    FGApiServerConfig
 from fgapiserverdaemon_process import\
-    set_config as set_config_process,\
-    set_db as set_db_process,\
     APIServerDaemonProcess
+from fgapiserverdaemon_config import fg_config
+from fgapiserverdaemon_db import fgapisrv_db
 from fgapiserverdaemon_tools import\
-    set_config as set_config_tools,\
-    get_fgapiserver_db,\
     check_db_ver,\
     check_db_reg
 from multiprocessing import Process
 import os
-import sys
 import logging
 import logging.config
 
@@ -45,38 +38,10 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-03-14 18:48:34'
-
-# Retrieve filename
-file_name, file_ext = os.path.basename(__file__).split('.')
-
-# fgAPIServerDeemon configuration file
-config_file = file_name + '.yaml'
-
-# fgAPIServerDaemon log config file
-log_config_file = file_name + '_log.conf'
-
-# Retrieve execution dir and place it to path
-run_dir = os.path.dirname(os.path.abspath(__file__)) + '/'
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+__update__ = '2019-03-21 19:19:57'
 
 # Create root logger object and configure logger
-logging.config.fileConfig(run_dir + log_config_file)
-
-# Load configuration
-fg_config = FGApiServerConfig(config_file)
-
-# Spread configuration across components
-set_config_db(fg_config)
-set_config_tools(fg_config)
-set_config_process(fg_config)
-
-# FutureGateway database object
-fgapisrv_db = get_fgapiserver_db()
-
-# Spread db object across components
-set_db_process(fgapisrv_db)
-# set_config_tools(fgapisrv_db)
+logging.config.fileConfig(fg_config['fgasd_log_conf'])
 
 #
 # The fgAPIServerDaemon starts here

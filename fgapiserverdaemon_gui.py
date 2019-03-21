@@ -19,17 +19,11 @@
 import logging.config
 from flask import Flask
 from flask import request
-from fgapiserverdaemon_db import\
-    set_config as set_config_db
-from fgapiserverdaemon_config import\
-    FGApiServerConfig
-from fgapiserverdaemon_config import\
-    FGApiServerConfig
+from fgapiserverdaemon_config import fg_config
 from fgapiserverdaemon_tools import\
-    set_config as set_config_tools,\
-    get_fgapiserver_db,\
     check_db_ver,\
     check_db_reg
+from fgapiserverdaemon_db import fgapisrv_db
 # from flask_login import LoginManager,\
 #                         login_required,\
 #                         current_user
@@ -48,39 +42,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-03-14 18:48:34'
-
-
-# Retrieve filename
-file_name, file_ext = os.path.basename(__file__).split('.')
-
-# fgAPIServerDeemon configuration file
-config_file = file_name + '.yaml'
-
-# fgAPIServerDaemon log config file
-log_config_file = file_name + '_log.conf'
-
-# Retrieve execution dir and place it to path
-run_dir = os.path.dirname(os.path.abspath(__file__)) + '/'
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
-# Create root logger object and configure logger
-logging.config.fileConfig(run_dir + log_config_file)
-
-# Load configuration
-fg_config = FGApiServerConfig(config_file)
-
-# Spread configuration across components
-set_config_db(fg_config)
-set_config_tools(fg_config)
-
-# FutureGateway database object
-fgapisrv_db = get_fgapiserver_db()
-
-# Spread db object across components
-# set_config_tools(fgapisrv_db)
-# set_db_process(fgapisrv_db)
-
+__update__ = '2019-03-21 19:19:57'
 
 # setup Flask app
 app = Flask(__name__)
@@ -94,7 +56,6 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-
     logging.debug('index(%s): %s' % (request.method, request.values.to_dict()))
     resp = "<html><body><h1>It works!</h1></body></html>"
     return resp

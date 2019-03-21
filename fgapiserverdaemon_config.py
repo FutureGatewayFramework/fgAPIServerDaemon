@@ -65,6 +65,9 @@ class FGApiServerConfig(dict):
             'thread_lock_file': '.tlock',
             'debug': 'True',
             'json_indent': '4',
+            'fgapisrv_iosandbox': '',
+            'fgasd_log_conf': 'fgapiserverdaemon_log.conf',
+            'fgasd_gui_log_conf': 'fgapiserverdaemon_gui_log.conf'
         },
         'fgapiserverdaemon_gui': {
             'name': 'APIServerDaemon GUI',
@@ -121,7 +124,7 @@ class FGApiServerConfig(dict):
         except IOError:
             logging.warn(
                 "Couldn't find configuration file '%s'; "
-                " default options will be used\n" % config_file)
+                " default options will be used" % config_file)
             pass
 
         # Load configuration settings using hardcoded key values as key
@@ -136,14 +139,14 @@ class FGApiServerConfig(dict):
                     logging.warn(
                         "Couldn't find option '%s' "
                         "in section '%s'; "
-                        "using default value '%s'\n"
+                        "using default value '%s'"
                         % (conf_name, section, def_value))
                 # The use of environment varialbes override any default or
                 # configuration setting present in the configuration file
                 try:
                     env_value = os.environ[conf_name.upper()]
                     logging.warn(
-                        "Environment bypass of '%s': '%s' <- '%s'\n" %
+                        "Environment bypass of '%s': '%s' <- '%s'" %
                         (conf_name, self[conf_name], env_value))
                     self[conf_name] = env_value
                 except KeyError:
@@ -215,3 +218,10 @@ class FGApiServerConfig(dict):
             for key in cfg_dict:
                 value = cfg_dict[key]
                 self[key] = value
+
+
+# fgAPIServerDeemon configuration file
+config_file = 'fgapiserverdaemon.yaml'
+
+# Load configuration
+fg_config = FGApiServerConfig(config_file)

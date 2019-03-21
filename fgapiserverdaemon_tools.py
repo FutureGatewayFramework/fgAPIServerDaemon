@@ -22,7 +22,8 @@ import uuid
 import socket
 import logging
 import logging.config
-
+from fgapiserverdaemon_config import fg_config
+from fgapiserverdaemon_db import fgapisrv_db
 
 """
   FutureGateway APIServer tools
@@ -35,17 +36,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-03-14 18:48:34'
-
-
-# Logging
-logger = logging.getLogger(__name__)
-
-# fgAPIServerDaemon configuration
-fg_config = None
-
-# FutureGateway database object
-fgapisrv_db = None
+__update__ = '2019-03-21 19:19:57'
 
 # Logging
 logger = logging.getLogger(__name__)
@@ -53,35 +44,6 @@ logger = logging.getLogger(__name__)
 #
 # Tooling functions commonly used by fgapiserber_ source codes
 #
-
-
-def set_config(config_obj):
-    """
-    Receive fgAPIServerDaemon configuration settings
-    :param config_obj:
-    :return:
-    """
-    global fg_config
-    fg_config = config_obj
-    logger.debug("Receiving configuration object")
-
-
-def get_fgapiserver_db():
-    """
-    Retrieve the fgAPIServer database object instance
-
-    :return: Return the fgAPIServer database object or None if the
-             database connection fails
-    """
-    db, message = get_db(
-        db_host=fg_config['fgapisrv_db_host'],
-        db_port=fg_config['fgapisrv_db_port'],
-        db_user=fg_config['fgapisrv_db_user'],
-        db_pass=fg_config['fgapisrv_db_pass'],
-        db_name=fg_config['fgapisrv_db_name'])
-    if db is None:
-        logging.error(message)
-    return db
 
 
 def check_db_ver():
@@ -93,9 +55,7 @@ def check_db_ver():
              database schema version is not aligned with the version
              required by the code; see fgapisrv_dbver in configuration file
     """
-    global fgapisrv_db
 
-    fgapisrv_db = get_fgapiserver_db()
     if fgapisrv_db is None:
         msg = "Unable to connect to the database!"
         logging.error(msg)
@@ -179,6 +139,7 @@ def update_db_config(config):
                  settings that will have highest priority. Returned value
                  will be the setting extracted from the DB if enabled.
     """
+
     # Retrieve the service UUID
     fgapisrv_uuid = srv_uuid()
     db_config = fgapisrv_db.srv_config(str(fgapisrv_uuid))

@@ -20,6 +20,7 @@ import logging
 import pymysql
 pymysql.install_as_MySQLdb()
 import MySQLdb
+from fgapiserverdaemon_config import fg_config
 from fgapiserverdaemon_command import APIServerCommand
 
 """
@@ -32,7 +33,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-03-14 18:48:34'
+__update__ = '2019-03-21 19:19:57'
 
 """
  Database connection default settings
@@ -45,23 +46,6 @@ def_db_name = 'fgapiserver'
 
 # Logging
 logger = logging.getLogger(__name__)
-
-# fgAPIServerDaemon configuration
-fg_config = None
-
-# FutureGateway database object
-fgapisrv_db = None
-
-
-def set_config(config_obj):
-    """
-    Receive fgAPIServerDaemon configuration settings
-    :param config_obj:
-    :return:
-    """
-    global fg_config
-    fg_config = config_obj
-    logging.debug("Receiving configuration object")
 
 
 def get_db(**kwargs):
@@ -378,7 +362,6 @@ class FGAPIServerDB:
 
         :return Stored configuration settings
         """
-        global fg_config
         db = None
         cursor = None
         safe_transaction = False
@@ -570,3 +553,14 @@ class FGAPIServerDB:
         finally:
             self.close_db(db, cursor, safe_transaction)
         return commands
+
+
+# FutureGateway database object
+fgapisrv_db, message = get_db(
+    db_host=fg_config['fgapisrv_db_host'],
+    db_port=fg_config['fgapisrv_db_port'],
+    db_user=fg_config['fgapisrv_db_user'],
+    db_pass=fg_config['fgapisrv_db_pass'],
+    db_name=fg_config['fgapisrv_db_name'])
+if fgapisrv_db is None:
+    logging.error(message)
