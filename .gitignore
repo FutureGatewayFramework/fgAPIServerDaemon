@@ -1,7 +1,7 @@
 *.pyc
 *.log
 .idea
-.venv
-.venv3
+.venv*
+venv*
 __pycache__
 fgapiserverdaemon.lock

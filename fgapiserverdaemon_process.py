@@ -19,7 +19,10 @@
 import os
 import time
 import logging
-import Queue
+try:
+    import Queue
+except ModuleNotFoundError:
+    import queue
 import multiprocessing
 import threading
 from fgapiserverdaemon_config import fg_config
@@ -41,7 +44,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-03-21 19:19:57'
+__update__ = '2019-03-21 20:33:35'
 
 # Logging
 logger = logging.getLogger(__name__)

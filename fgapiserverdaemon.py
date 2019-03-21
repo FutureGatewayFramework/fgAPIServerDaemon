@@ -38,7 +38,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-03-21 19:19:57'
+__update__ = '2019-03-21 20:33:35'
 
 # Create root logger object and configure logger
 logging.config.fileConfig(fg_config['fgasd_log_conf'])
