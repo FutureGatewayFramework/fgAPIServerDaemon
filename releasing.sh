@@ -65,58 +65,104 @@ unit_tests() {
   cd -
 }
 
-# $1 - PythonX flag
-# $2 - Python venvX file
-do_tests() {
-  PY_FLAG=$1
-  PY_VENV=$2
-  echo "Performing tests for $PY_VENV"
-  [ $((PY_FLAG)) -eq 0 ] &&\
-    echo "Python tests disabled for $PY_VENV" &&\
-    return 0
-  source $PY_VENV/bin/activate &&\
-  pip install -r requirements.txt &&\
-  pip install pycodestyle &&\
-  check_style &&\
-  unit_tests &&\
-  deactivate || return 1
+# Call checkstyle
+check_style() {
+  pycodestyle --ignore=E402 *.py &&\
+  pycodestyle tests/*.py
 }
 
-setup_python() {
+# Prepare test environment for Python v2
+venv2() {
+  echo "Preparing virtualenv for Python2"
+  $PYTHON2 -m virtualenv $VENV2 &&\
+  source ./$VENV2/bin/activate &&\
+  pip install -r requirements.txt &&\
+  pip install pycodestyle
+}
+
+# Prepare test environment for Python v3
+venv3() {
+  echo "Preparing virtualenv for Python3"
+  $PYTHON3 -m venv $VENV3 &&\
+  source ./$VENV3/bin/activate &&\
+  pip install -r requirements.txt &&\
+  pip install pycodestyle
+}
+
+# Perform tests for Python v2
+tests_py2() {
+  echo "Testing for Python v2" &&\
+  unit_tests
+}
+
+# Perform tests for Python v3
+tests_py3() {
+  echo "Testing for Python v3" &&\
+  unit_tests
+}
+
+# Setup Virtual environment and start check style and unittests
+check_style_and_tests() {
   PIP=$(which pip)
   [ "$PIP" = "" ] &&\
     echo "Python pip is not present, unable to perform any test" &&\
     return 1
 
-  PY2_FLAG=$(which $PYTHON2 | wc -l)
-  PY2_FAIL=0
-  [ $((PY2_FLAG)) -ne 0 ] &&\
-    $PYTHON2 -m virtualenv $VENV2 &&\
-    echo "Virtual environment for python2 created" ||\
-    PY2_FAIL=1
-
-  PY3_FLAG=$(which $PYTHON3 | wc -l)
-  PY3_FAIL=0
-  [ $((PY3_FLAG)) -ne 0 ] &&\
-    $PYTHON3 -m venv $VENV3 &&\
-    echo "Virtual environment for python3 created" ||\
-    PY3_FAIL=1
-
-  [ $((PY2_FAIL)) -ne 0 ] &&\
-    echo "Python2 environment creation failed" &&\
+  RES=0
+  PYTHON_2=$(which $PYTHON2)
+  [ "$PYTHON_2" = "" ] &&\
+    echo "which command could not determine python2; trying with 'python'" &&\
+    PYTHON_2=$(python --version 2>&1 | awk '{ print substr($2,1,1) }')
+  [ "$PYTHON_2" = "2" ] &&\
+    echo "python2 is python" &&\
+    PYTHON2=python
+  if [ "$PYTHON_2" != "" ]; then
+    venv2 &&\
+    check_style &&\
+    tests_py2 &&\
+    PY2_DONE=1 ||\
+    PY2_DONE=0 
+  else
+   echo "No python 2 found, skipping tests for this version"
+  fi
+  [ $((PY2_DONE)) -eq 0 ] &&\
+    echo "Releasing chain for python2 failed" &&\
     return 1
-  [ $((PY3_FAIL)) -ne 0 ] &&\
-    echo "Python3 environment creation failed" &&\
+  
+  PYTHON_3=$(which $PYTHON3)
+  [ "$PYTHON_3" = "" ] &&\
+    echo "which command could not determine python3; trying with 'python'" &&\
+    PYTHON_3=$(python --version 2>&1 | awk '{ print substr($2,1,1) }')
+  [ "$PYTHON_3" = "3" ] &&\
+    echo "python3 is python" &&\
+    PYTHON3=python
+  if [ "$PYTHON_3" != "" ]; then
+    venv3 &&\
+    check_style &&\
+    tests_py3 &&\
+    PY3_DONE=1 ||\
+    PY3_DONE=0 
+  else
+    echo "No python 3 found, skipping tests for this version"
+  fi
+  [ $((PY3_DONE)) -eq 0 ] &&\
+    echo "Releasing chain for python3 failed" &&\
     return 1
+
+  # No python found at all
+  [ $((PY2_DONE)) -eq 0 -a\
+    $((PY3_DONE)) -eq 0 ] &&\
+    echo "Neither python2 nor python3 found" &&\
+    return 1 
+  
   return 0
 }
 
+#
 # Releasing
-echo "Starting releasing ..." &&\
-setup_python &&\
-echo "Checking style" &&\
-do_tests $PY2_FLAG $VENV2 &&\
-do_tests $PY3_FLAG $VENV3 &&\
-set_code_headers &&
-echo "Done"
-
+#
+echo "Starting releasing fgAPIServerDaemon ..." &&\
+check_style_and_tests &&\
+set_code_headers &&\
+echo "Done" ||\
+echo "Failed"
