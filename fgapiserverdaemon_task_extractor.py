@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2015:
 # Istituto Nazionale di Fisica Nucleare (INFN), Italy
 #
@@ -35,7 +36,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-03-28 18:58:57'
+__update__ = '2019-04-15 11:38:33'
 
 # Logging
 logger = logging.getLogger(__name__)
@@ -78,7 +79,7 @@ class APIServerDaemonProcessTaskExtractor(threading.Thread):
         while self.loop_state is True:
             self.extract_commands()
             logging.debug(self.log_str(
-                "Task extractor loop, sleepping 10 seconds ..."))
+                "Task extractor loop, sleeping 10 seconds ..."))
             time.sleep(10)
         logging.debug(self.log_str(
             "Terminated fgAPIServerDaemon task extractor"))

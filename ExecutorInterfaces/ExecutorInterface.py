@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding: utf-8
 # Copyright (c) 2015:
 # Istituto Nazionale di Fisica Nucleare (INFN), Italy
 #
@@ -16,7 +17,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import importlib
-from abc import abstractmethod
 from enum import Enum
 
 """
@@ -64,18 +64,24 @@ def executor_interface(ei_name):
        print("Unable to find class")
     return instance
 
-class ExecutorInterface():
+class BaseExecutorInterface(object):
     """
     Executor Interface Abstract class
     """
     
-    def __init__():
+    def __init__(self):
         """
         Executor Interface Constructor
         """
         pass
 
-    def exec(self, action):
+    def __repr__(self):
+        """
+        Representation for BaseExecutorInterface
+        """
+        raise EIError("ExecutorInterface representation is not implemented")
+
+    def action(self, action):
         """
         Perform the given executor interface action
         """
@@ -92,55 +98,50 @@ class ExecutorInterface():
         elif action == EIActions.DELETE.name:
             self.delete()
         else:
-            raise UnknownEIAction("Unknown action '%s'" % action);
+            raise EIError("Unknown action '%s'" % action);
 
-    @abstractmethod
     def clean(self):
         """
         Clean
         """
-        pass
+        raise EIError("Action: 'CLEAN' is not implemented")
 
-    @abstractmethod
     def get_status(self):
         """
         Get Status
         """
-        pass
+        raise EIError("Action: 'GET_STATUS' is not implemented")
 
-    @abstractmethod
     def get_output(self):
         """
         Get Output
         """
-        pass
+        raise EIError("Action: 'GET_OUTPUT' is not implemented")
 
-    @abstractmethod
     def cancel(self):
         """
         Cancel
         """
-        pass
+        raise EIError("Action: 'CANCEL' is not implemented")
 
-    @abstractmethod
     def submit(self):
         """
         Submit
         """
-        pass
+        raise EIError("Action: 'SUBMIT' is not implemented")
 
-    @abstractmethod
     def delete(self):
         """
         Delete
         """
-        pass
+        raise EIError("Action 'DELETE' is not implemented")
 
 
-class UnknownEIAction(Exception):
+class EIError(Exception):
      """
      Called when an unknown Executor Interface Action is called
      """
+     pass
 
 
 

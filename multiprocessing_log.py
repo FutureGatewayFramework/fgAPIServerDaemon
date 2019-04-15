@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Multiprocessing log rotating file handler
 # https://mattgathu.github.io/multiprocessing-logging-in-python/
 # https://gist.github.com/JesseBuesking/10674086

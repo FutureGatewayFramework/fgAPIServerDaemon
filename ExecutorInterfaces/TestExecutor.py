@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding: utf-8
 # Copyright (c) 2015:
 # Istituto Nazionale di Fisica Nucleare (INFN), Italy
 #
@@ -15,7 +16,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from ExecutorInterface import ExecutorInterface
+from __future__ import print_function
+from ExecutorInterface import BaseExecutorInterface
 
 """
   FutureGateway Test Executor Inteface
@@ -31,7 +33,7 @@ __status__ = 'devel'
 __update__ = '2019-03-23 16:12:11'
 
 
-class TestExecutor(ExecutorInterface):
+class TestExecutor(BaseExecutorInterface):
     """
     Test Executor Interface, it jus execute commands in localhost
     """
@@ -43,34 +45,34 @@ class TestExecutor(ExecutorInterface):
         """
         Clean
         """
-        print("clean TestExecutor")
+        print("clean action in %s called, " % __name__, end='')
 
     def get_status(self):
         """
         Get Status
         """
-        print("get_status TestExecutor")
+        print("get_status action in %s called, " % __name__, end='')
 
     def get_output(self):
         """
         Get Output
         """
-        print("get_output TestExecutor")
+        print("get_output action in %s called, " % __name__, end=' ')
 
     def cancel(self):
         """
         Cancel
         """
-        print("cancel TestExecutor")
+        print("cancel action in %s called, " % __name__, end=' ')
 
-    #def submit(self):
-    #    """
-    #    Submit
-    #    """
-    #    print("submit TestExecutor")
+    def submit(self):
+        """
+        Submit
+        """
+        print("submit action in %s called, " % __name__, end=' ')
 
     def delete(self):
         """
         Delete
         """
-        print("delete TestExecutor")
+        print("delete action in  TestExecutor", end=' ')

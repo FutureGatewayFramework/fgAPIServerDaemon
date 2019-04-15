@@ -68,7 +68,7 @@ fgapiserverdaemon_gui:
 
 # futuregateway database settings
 fgapiserver_db:
-  dbver: 0.0.12b
+  dbver: 0.0.13
   fgapisrv_db_host: 127.0.0.1
   fgapisrv_db_port: 3306
   fgapisrv_db_user: fgapiserver

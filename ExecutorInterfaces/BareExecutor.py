@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding: utf-8
 # Copyright (c) 2015:
 # Istituto Nazionale di Fisica Nucleare (INFN), Italy
 #
@@ -18,7 +19,9 @@
 from abc import ABCMeta, abstractmethod
 from enum import Enum
 import importlib
-from ExecutorInterface import ExecutorInterface
+from ExecutorInterface\
+    import BaseExecutorInterface,\
+           EIError
 
 """
   FutureGateway Bare Executor Inteface
@@ -34,13 +37,20 @@ __status__ = 'devel'
 __update__ = '2019-03-23 16:12:11'
 
 
-class BareExecutor(ExecutorInterface):
+class BareExecutor(BaseExecutorInterface):
     """
-    Bare Executor Interface, it jus execute commands in localhost
+    Bare Executor Interface, it jus execute commands in Daemon' host
     """
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         print("init BareExecutor")
+        if kwargs is not None:
+            for key, value in kwargs.iteritems():
+                print "%s == %s" % (key, value)
+        else:
+            raise EIError(
+                "Missing mandatory parameters for %s executor interface")
+
 
     def clean(self):
         """
