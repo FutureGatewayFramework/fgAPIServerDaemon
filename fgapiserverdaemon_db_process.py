@@ -21,8 +21,9 @@ import logging
 import pymysql
 pymysql.install_as_MySQLdb()
 import MySQLdb
-from fgapiserverdaemon_db import FGAPIServerDB
+from fgapiserverdaemon_db import FGAPIServerDB, get_db
 from fgapiserverdaemon_command import APIServerCommand
+from fgapiserverdaemon_config import fg_config
 
 """
   GridEngine APIServerDaemon database
@@ -34,7 +35,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-05-02 19:00:22'
+__update__ = '2019-05-02 19:08:49'
 
 # Logging
 logger = logging.getLogger(__name__)
@@ -221,3 +222,14 @@ class FGAPIServerDB_process(FGAPIServerDB):
         finally:
             self.close_db(db, cursor, safe_transaction)
         return commands
+
+
+# FutureGateway database object
+fgapisrv_db, message = get_db(
+    db_host=fg_config['fgapisrv_db_host'],
+    db_port=fg_config['fgapisrv_db_port'],
+    db_user=fg_config['fgapisrv_db_user'],
+    db_pass=fg_config['fgapisrv_db_pass'],
+    db_name=fg_config['fgapisrv_db_name'])
+if fgapisrv_db is None:
+    logging.error(message)
