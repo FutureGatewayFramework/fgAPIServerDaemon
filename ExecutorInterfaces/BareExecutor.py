@@ -16,9 +16,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from abc import ABCMeta, abstractmethod
-from enum import Enum
-import importlib
+import yaml
 from ExecutorInterface\
     import BaseExecutorInterface,\
            EIError
@@ -37,6 +35,12 @@ __status__ = 'devel'
 __update__ = '2019-03-23 16:12:11'
 
 
+class BareExecutorConfig(EIConfig):
+
+    def __init__(self, config_file):
+        defaults['bare_executor'] = {'base_path': 'bare_executor'}
+        EIConfig.__init__(self,'bare_executor.yaml')
+
 class BareExecutor(BaseExecutorInterface):
     """
     Bare Executor Interface, it jus execute commands in Daemon' host
@@ -50,6 +54,7 @@ class BareExecutor(BaseExecutorInterface):
         else:
             raise EIError(
                 "Missing mandatory parameters for %s executor interface")
+        self.ei_config = BareExecutorConfig("bare_executor.yml")
 
 
     def clean(self):

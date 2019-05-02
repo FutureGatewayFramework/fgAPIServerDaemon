@@ -17,7 +17,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import print_function
-from ExecutorInterface import BaseExecutorInterface
+from ExecutorInterface\
+    import BaseExecutorInterface,\
+           executor_interface,\
+           EIError
 
 """
   FutureGateway Test Executor Inteface
@@ -76,3 +79,68 @@ class TestExecutor(BaseExecutorInterface):
         Delete
         """
         print("delete action in  TestExecutor", end=' ')
+
+if __name__ == "__main__":
+    print("This is a test ExecutorInterface")
+
+    ei_name = 'TestExecutor'
+    test_ei = executor_interface(ei_name)
+
+    if test_ei is not None:
+
+        # Using exec method
+        try:
+            print("Using action method:")
+            print("  CLEAN ... ", end='')
+            test_ei.action('CLEAN')
+            print("ok")
+            print("  GETSTATUS ... ", end='')
+            test_ei.action('GETSTATUS')
+            print("ok")
+            print("  GETOUTPUT ... ", end='')
+            test_ei.action('GETOUTPUT')
+            print("ok")
+            print("  CANCEL ... ", end='')
+            test_ei.action('CANCEL')
+            print("ok")
+            print("  SUBMIT ... ", end='')
+            test_ei.action('SUBMIT')
+            print("ok")
+            print("  DELETE ... ", end='')
+            test_ei.action('DELETE')
+            print("ok")
+            print("  UNKNOWN ... ", end='')
+            test_ei.action('UNKNOWN')
+            print("ok")
+        except EIError as e:
+            print("failed")
+            print("EI exception occurred: '%s'" % e)
+
+        # Method may be called directly
+        try:
+            print("Using direct call:")
+            print("  clean() ... ", end='')
+            test_ei.clean()
+            print("ok")
+            print("  get_status() ... ", end='')
+            test_ei.get_status()
+            print("ok")
+            print("  get_output() ... ", end='')
+            test_ei.get_output()
+            print("ok")
+            print("  cancel() ... ", end='')
+            test_ei.cancel()
+            print("ok")
+            print("  submit() ... ", end='')
+            test_ei.submit()
+            print("ok")
+            print("  delete() ... ", end='')
+            test_ei.delete()
+            print("ok")
+            print("  undefined() ... ", end='')
+            test_ei.undefined()
+            print("ok")
+        except AttributeError as e:
+            print("Generic exception: '%s'" % e)
+    else:
+        print("No '%s' interface received" % ei_name)

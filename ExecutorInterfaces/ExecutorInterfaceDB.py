@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+# coding: utf-8
 # Copyright (c) 2015:
 # Istituto Nazionale di Fisica Nucleare (INFN), Italy
 #
@@ -16,44 +16,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import importlib
+import yaml
+import json
+import logging
 
-from fgapiserverdaemon_config import fg_config
-from fgapiserverdaemon_db import fgapisrv_db
-import os
-import sys
-import logging.config
-import threading
+# Logging object
+logger = logging.getLogger(__name__)
+
 
 """
-  FutureGateway APIServerDaemon task extractor
+  FutureGateway Executor Inteface Database
 """
 
 __author__ = 'Riccardo Bruno'
 __copyright__ = '2019'
 __license__ = 'Apache'
-__version__ = 'v0.0.0'
+__version__ = 'v0.0.10'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-05-02 19:00:22'
-
-# Logger object
-logger = None
+__update__ = '2019-03-23 16:12:11'
 
 
-class fgAPIServerDaemonEI(threading.Thread):
-    def __init__(self, thread_manager):
-        global logger
-        threading.Thread.__init__(self)
-
-        logger = logging.getLogger(__name__)
-
-        # Store thread_manager
-        self.thread_manager = thread_manager
-
-    def run(self):
-        global logger
-        global fgapisrv_db
-        logger.debug("Starting fgAPIServerDaemon EI")
-        logger.debug("Available thread slots: %s"
-                     % self.thread_manager.get_slots())
