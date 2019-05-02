@@ -22,7 +22,7 @@ import time
 import logging.config
 import threading
 from fgapiserverdaemon_config import fg_config
-from fgapiserverdaemon_db_process import fgapisrv_db
+from fgapiserverdaemon_db_process import fgapisrv_db_process
 
 """
   FutureGateway APIServerDaemon task extractor
@@ -59,14 +59,14 @@ class APIServerDaemonProcessTaskExtractor(threading.Thread):
 
     def run(self):
         # Database object must be present
-        if fgapisrv_db is None:
+        if fgapisrv_db_process is None:
             logging.error(self.log_str(
                 "Database object not present, unable to start"
                 "APIServerDaemon task extractor thread"))
             return
 
         # Database object has to operate correctly
-        if not fgapisrv_db.test():
+        if not fgapisrv_db_process.test():
             logging.error(self.log_str(
                 "fgAPIServerDaemon task extractor could not connect to the "
                 "database"))
@@ -87,7 +87,7 @@ class APIServerDaemonProcessTaskExtractor(threading.Thread):
         self.loop_state = False
 
     def extract_commands(self):
-        commands = fgapisrv_db.get_queued_commands(
+        commands = fgapisrv_db_process.get_queued_commands(
             fg_config['extract_loop_records'])
         for command in commands:
             self.queue_lock.acquire()

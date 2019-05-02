@@ -194,8 +194,9 @@ class FGAPIServerDB:
             passwd=self.db_pass,
             db=self.db_name,
             port=self.db_port,
-            charset='utf-8',
-            use_unicode=True)
+            charset='utf8',
+            use_unicode=True,
+        )
         if db is not None and safe_transaction is True:
             sql = "BEGIN"
             sql_data = ()

@@ -21,7 +21,14 @@ import logging
 import pymysql
 pymysql.install_as_MySQLdb()
 import MySQLdb
-from fgapiserverdaemon_db import FGAPIServerDB, get_db
+from fgapiserverdaemon_db\
+    import FGAPIServerDB,\
+           def_db_host,\
+           def_db_port,\
+           def_db_host,\
+           def_db_user,\
+           def_db_pass,\
+           def_db_name
 from fgapiserverdaemon_command import APIServerCommand
 from fgapiserverdaemon_config import fg_config
 
@@ -40,22 +47,62 @@ __update__ = '2019-05-02 19:08:49'
 # Logging
 logger = logging.getLogger(__name__)
 
+
+def get_db(**kwargs):
+    """
+    Retrieve the fgAPIServer database object
+
+    :return: Return the fgAPIServer database object or None if the
+             database connection fails
+    """
+    args = {}
+    if kwargs is not None:
+        for key, value in kwargs.items():
+            args[key] = value
+    db_host = args.get('db_host', def_db_host)
+    db_port = args.get('db_port', def_db_port)
+    db_user = args.get('db_user', def_db_user)
+    db_pass = args.get('db_pass', def_db_pass)
+    db_name = args.get('db_name', def_db_name)
+    db_object = FGAPIServerDBProcess(
+        db_host=db_host,
+        db_port=db_port,
+        db_user=db_user,
+        db_pass=db_pass,
+        db_name=db_name)
+    db_state = db_object.get_state()
+    if db_state[0] != 0:
+        message = ("Unbable to connect to the database:\n"
+                   "  host: %s\n"
+                   "  port: %s\n"
+                   "  user: %s\n"
+                   "  pass: %s\n"
+                   "  name: %s\n"
+                   % (db_host,
+                      db_port,
+                      db_user,
+                      db_pass,
+                      db_name))
+        return None, message
+    return db_object, None
+
+
 """
   fgapiserver_db_process Class contain any database query performed by the
   process elements: task_checker and task_extractor
 """
 
 
-class FGAPIServerDB_process(FGAPIServerDB):
+class FGAPIServerDBProcess(FGAPIServerDB):
     """
     FutureGateway API Server Database class for process
     """
 
-    def __init__(self, **kwargs):
-        """
-        Constructor may override default values defined at the top of the file
-        """
-        super(FGAPIServerDB_process, self).__init__(kwargs)
+    #def __init__(self, **kwargs):
+    #    """
+    #    Constructor may override default values defined at the top of the file
+    #    """
+    #    super(FGAPIServerDBProcess, self).__init__(kwargs)
 
     def queue_tasks_retrieve(self):
         """
@@ -225,11 +272,11 @@ class FGAPIServerDB_process(FGAPIServerDB):
 
 
 # FutureGateway database object
-fgapisrv_db, message = get_db(
+fgapisrv_db_process, message = get_db(
     db_host=fg_config['fgapisrv_db_host'],
     db_port=fg_config['fgapisrv_db_port'],
     db_user=fg_config['fgapisrv_db_user'],
     db_pass=fg_config['fgapisrv_db_pass'],
     db_name=fg_config['fgapisrv_db_name'])
-if fgapisrv_db is None:
+if fgapisrv_db_process is None:
     logging.error(message)

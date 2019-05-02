@@ -23,7 +23,7 @@ import logging
 try:
     import Queue
 except ModuleNotFoundError:
-    import queue
+    import queue as Queue
 import multiprocessing
 import threading
 from fgapiserverdaemon_config import fg_config
