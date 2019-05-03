@@ -23,12 +23,12 @@ pymysql.install_as_MySQLdb()
 import MySQLdb
 from fgapiserverdaemon_db\
     import FGAPIServerDB,\
-           def_db_host,\
-           def_db_port,\
-           def_db_host,\
-           def_db_user,\
-           def_db_pass,\
-           def_db_name
+    def_db_host,\
+    def_db_port,\
+    def_db_host,\
+    def_db_user,\
+    def_db_pass,\
+    def_db_name
 from fgapiserverdaemon_command import APIServerCommand
 from fgapiserverdaemon_config import fg_config
 
@@ -42,7 +42,7 @@ __version__ = 'v0.0.0'
 __maintainer__ = 'Riccardo Bruno'
 __email__ = 'riccardo.bruno@ct.infn.it'
 __status__ = 'devel'
-__update__ = '2019-05-02 19:08:49'
+__update__ = '2019-05-03 17:04:36'
 
 # Logging
 logger = logging.getLogger(__name__)
@@ -97,12 +97,6 @@ class FGAPIServerDBProcess(FGAPIServerDB):
     """
     FutureGateway API Server Database class for process
     """
-
-    #def __init__(self, **kwargs):
-    #    """
-    #    Constructor may override default values defined at the top of the file
-    #    """
-    #    super(FGAPIServerDBProcess, self).__init__(kwargs)
 
     def queue_tasks_retrieve(self):
         """
